@@ -74,7 +74,7 @@
             - lr=0.001
             - batch_size=8
             - optimizer=sgd
-            - oversample=1/2/1/6/7
+            - oversample=1/4/2/2/7
             - decay_f=0.1
             - metric=kappa
             - save_model=False
