@@ -1,0 +1,14 @@
+# Ignore python local caching files
+__pycache__
+**.idea
+# Ignore notebook checkpoints
+**.ipynb_checkpoints
+**.ipynb
+# Do not push data
+data
+results
+# Do not push pytorch models
+**.pth
+# Do not push pdfs (who knows)
+**.pdf
+
