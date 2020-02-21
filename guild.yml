@@ -1,0 +1,82 @@
+- model: eyepacs
+  description: DR grading on eyepacs
+  sourcecode:
+    # Source code config at the model level applies to all
+    # operations. In this case we want to copy all of the text files
+    # (the default configuration) but exclude everything under 'data'.
+    - exclude: 'data/*'
+    - exclude: 'experiments/*'
+
+  operations:
+    train:
+      # The default 'main' attribute is 'train' based on the
+      # operation name. While we could omit this below, it's good
+      # practice to specify it.
+      main: train
+
+      # In this configuration, we require the project 'data'
+      # directory. Guild creates a symbolic link named 'data' to
+      # this directory in each run directory for the operation.
+      requires:
+        - file: data
+        - file: experiments
+        - file: utils
+        - file: models
+        - file: results
+
+    test_experiment_class:
+      description:
+        This is a test experiment with one epoch to check that guild.ai works
+      steps:
+        - run: train
+          flags:
+            - csv_train='train.csv'
+            - lr=0.01
+            - optimizer=['sgd','adam']
+            - n_epochs=3
+            - save_model=True
+
+########################################################################################################################
+    template_class_experiment:
+      description:
+        This is a template for a classification experiment.
+        Write here conclusions.
+      steps:
+        - run: train
+          flags:
+            - csv_train=train.csv
+            - model_name=[resnet18_cifar,resnet50_cifar,resnet18,resnet50,resnext50,resnext101]
+            - pretrained=[True,False]
+            - loss_fn=[CE,ULS,GLS,trivial_ot]
+            - lr=0.001
+            - batch_size=8
+            - optimizer=[adam,sgd]
+            - oversample=[1/1/1,1/2/1/6/7]
+            - n_epochs=100
+            - patience=20
+            - decay_f=0.1
+            - metric=[kappa,kappa_auc_avg]
+            - save_model=False
+
+########################################################################################################################
+    dr_grade:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - csv_train=train_od.csv
+            - model_name=resnet50
+            - pretrained=True
+            - base_loss=[ce,gls,focal_loss]
+            - lambd=[0]
+            - exp=[2]
+            - lr=0.001
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=1/2/1/6/7
+            - decay_f=0.1
+            - metric=kappa
+            - save_model=False
+            - n_epochs=50
+            - patience=5
