@@ -68,8 +68,8 @@
             - csv_train=train_od.csv
             - model_name=resnet50
             - pretrained=True
-            - base_loss=[ce,gls,focal_loss]
-            - lambd=[0,0.1,1,10]
+            - base_loss=[ce,gls]
+            - lambd=[100]
             - exp=[2]
             - lr=0.001
             - batch_size=8
