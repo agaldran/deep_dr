@@ -69,7 +69,7 @@
             - model_name=resnet50
             - pretrained=True
             - base_loss=[ce,gls,focal_loss]
-            - lambd=[0]
+            - lambd=[0,0.1,1,10]
             - exp=[2]
             - lr=0.001
             - batch_size=8
@@ -77,6 +77,6 @@
             - oversample=1/4/2/2/7
             - decay_f=0.1
             - metric=kappa
-            - save_model=False
+            - save_model=True
             - n_epochs=50
             - patience=5
