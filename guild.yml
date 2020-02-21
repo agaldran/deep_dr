@@ -88,7 +88,7 @@
         - run: train
           flags:
             - csv_train=[train_od.csv,train_mac.csv]
-            - model_name=resnext
+            - model_name=resnext50
             - pretrained=True
             - base_loss=[ce,gls]
             - lambd=[0,0.1,1,10]
