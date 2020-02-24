@@ -6,10 +6,10 @@ from utils.lookahead import Lookahead
 
 from models.get_model import get_arch
 from utils.get_loaders import get_train_val_loaders, modify_dataset
-from utils.losses import get_criterion
+from utils.losses import get_cost_sensitive_criterion, get_cost_sensitive_regularized_criterion
 from utils.evaluation import eval_predictions_multi, ewma
 from utils.reproducibility import set_seeds
-from utils.model_saving_loading import write_model
+from utils.model_saving_loading import write_model, load_model
 from tqdm import trange
 import numpy as np
 import torch
@@ -65,6 +65,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--csv_train', type=str, default='train_od.csv', help='path to training data csv')
 parser.add_argument('--model_name', type=str, default='resnet18', help='selected architecture')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
+parser.add_argument('--load_checkpoint', type=str, default='no', help='path to pre-trained checkpoint')
 parser.add_argument('--base_loss', type=str, default='gls', help='base loss function (ce)')
 parser.add_argument('--lambd', type=float, default=1, help='lagrange multiplier for ot_loss')
 parser.add_argument('--exp', type=float, default=2, help='matrix exponentiation M**exp')
@@ -208,6 +209,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     model_name = args.model_name
     pretrained = args.pretrained
+    load_checkpoint = args.load_checkpoint
     base_loss = args.base_loss
     lambd = args.lambd
     exp = args.exp
@@ -238,8 +240,12 @@ if __name__ == '__main__':
 
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-    model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    if load_checkpoint != 'no':
+        print('* Loading weights from previous checkpoint={}'.format(load_checkpoint))
+        model, stats, optimizer_state_dict = load_model(model, load_checkpoint, device='cpu', with_opt=True)
+    model = model.to(device)
+
 
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     train_loader, val_loader = get_train_val_loaders(csv_path_train=csv_train, csv_path_val=csv_val,
@@ -254,11 +260,17 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     else:
         sys.exit('not a valid optimizer choice')
+    if load_checkpoint != 'no':
+        optimizer.load_state_dict(optimizer_state_dict)
+        for i, param_group in enumerate(optimizer.param_groups):
+            param_group['lr'] = lr
 
     print('* Instantiating base loss function {}, lambda={}, exp={}'.format(
             base_loss, str(lambd).rstrip('0'), str(exp).rstrip('0')))
-
-    train_crit, val_crit = get_criterion(base_loss=base_loss, n_classes=n_classes, lambd=lambd, exp=1)
+    if base_loss == 'no':
+        train_crit, val_crit = get_cost_sensitive_criterion(n_classes=n_classes, exp=1)
+    else:
+        train_crit, val_crit = get_cost_sensitive_regularized_criterion(base_loss=base_loss, n_classes=n_classes, lambd=lambd, exp=1)
 
     print('* Starting to train\n','-' * 10)
     m1, m2 = train_cls(model, optimizer, train_crit, val_crit, train_loader, val_loader,

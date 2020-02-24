@@ -81,19 +81,20 @@
             - n_epochs=50
             - patience=5
 ########################################################################################################################
-    dr_grade_saturday:
+    dr_grade_from_eyepacs:
       description:
         This is the main experiment on dr grading
       steps:
         - run: train
           flags:
             - csv_train=[train_od.csv,train_mac.csv]
-            - model_name=resnext50
+            - model_name=resnet50
             - pretrained=True
             - base_loss=[ce,gls]
+            - load_checkpoint=models/resnet50_eyepacs
+            - lr=0.0001
             - lambd=[0,0.1,1,10]
             - exp=[2]
-            - lr=0.001
             - batch_size=8
             - optimizer=sgd
             - oversample=1/4/2/2/7
