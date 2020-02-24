@@ -99,7 +99,7 @@
             - optimizer=sgd
             - oversample=1/4/2/2/7
             - decay_f=0.1
-            - metric=kappa
+            - metric=[kappa,kappa_auc_avg]
             - save_model=False
             - n_epochs=50
             - patience=5
