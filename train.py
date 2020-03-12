@@ -167,7 +167,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
         if is_better(monitoring_metric, best_monitoring_metric):
              print('Best (smoothed) val {} attained. {:.4f} --> {:.4f}'.format(
                  metric, best_monitoring_metric, monitoring_metric))
-             best_auc, best_kappa = vl_auc, vl_k
+             best_auc, best_kappa, best_acc = vl_auc, vl_k, vl_acc
              if exp_path != None:
                  print(15*'-',' Checkpointing ', 15*'-')
                  write_model(exp_path, model, optimizer, stats)
@@ -180,8 +180,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
         else:
             counter_since_checkpoint += 1
 
-        # if decay_f != 0 and counter_since_checkpoint == 3*patience//4:
-        if decay_f != 0 and counter_since_checkpoint == patience // 4:
+        if decay_f != 0 and counter_since_checkpoint == 3*patience//4:
             reduce_lr(optimizer, epoch, factor=decay_f, verbose=False)
             print(8 * '-', ' Reducing LR now ', 8 * '-')
 
@@ -190,11 +189,11 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
             print('\n Early stopping the training, trained for {:d} epochs'.format(epoch))
             del model
             torch.cuda.empty_cache()
-            return best_kappa, best_auc
+            return best_kappa, best_auc, best_acc
 
     del model
     torch.cuda.empty_cache()
-    return best_kappa, best_auc
+    return best_kappa, best_auc, best_acc
 
 if __name__ == '__main__':
     '''
@@ -283,10 +282,11 @@ if __name__ == '__main__':
                                                                         lambd=lambd, exp=exp)
 
     print('* Starting to train\n','-' * 10)
-    m1, m2 = train_cls(model, optimizer, train_crit, val_crit, train_loader, val_loader,
+    m1, m2, m3 = train_cls(model, optimizer, train_crit, val_crit, train_loader, val_loader,
               oversample, n_epochs, metric, patience, decay_f, experiment_path)
     print("kappa: %f" % m1)
     print("auc: %f" % m2)
+    print("acc: %f" % m3)
 
 
     if save_model:
@@ -294,4 +294,6 @@ if __name__ == '__main__':
         file.write(str(m1))
         file.write('\n')
         file.write(str(m2))
+        file.write('\n')
+        file.write(str(m3))
         file.close()

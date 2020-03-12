@@ -152,6 +152,56 @@
             - patience=10
 
 ########################################################################################################################
+    dr_grade_from_eyepacs_quality:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - csv_train=train_quality.csv
+            - n_classes=2
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
+            - pretrained=True
+            - base_loss=[ce,focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.001,0.0001]
+            - lambd=0
+            - exp=1
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=1/1 # for quality
+            - decay_f=0.1
+            - metric=auc
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+
+########################################################################################################################
+    dr_grade_from_eyepacs_artifact:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - csv_train=train_artifact.csv
+            - n_classes=6
+            - model_name=resnet50
+            - pretrained=True
+            - base_loss=[focal_loss]
+            - load_checkpoint=[no,models/resnet50_eyepacs]
+            - lr=0.001
+            - lambd=[0,0.1,1,10]
+            - exp=1
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=1/5/1/2/2/5 # for artifact
+            - decay_f=0.1
+            - metric=auc
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+
+########################################################################################################################
     dr_grade_from_eyepacs_clarity:
       description:
         This is the main experiment on dr grading
@@ -163,7 +213,7 @@
             - model_name=resnet50
             - pretrained=True
             - base_loss=[focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs]
+            - load_checkpoint=[no,models/resnet50_eyepacs]
             - lr=0.001
             - lambd=10
             - exp=1
@@ -172,9 +222,9 @@
             - oversample=8/3/1/1/1 # for clarity
             - decay_f=0.1
             - metric=auc
-            - save_model=True
-            - n_epochs=100
-            - patience=10
+            - save_model=False
+            - n_epochs=50
+            - patience=5
 
 ########################################################################################################################
     dr_grade_from_eyepacs_field_def:
@@ -189,7 +239,7 @@
             - model_name=resnet50
             - pretrained=True
             - base_loss=[focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs]
+            - load_checkpoint=[no,models/resnet50_eyepacs]
             - lr=0.001
             - lambd=10
             - exp=1
@@ -198,56 +248,9 @@
             - oversample=10/4/1/1/1 # for field_def
             - decay_f=0.1
             - metric=auc
-            - save_model=True
-            - n_epochs=100
-            - patience=10
+            - save_model=False
+            - n_epochs=50
+            - patience=5
 
 
-########################################################################################################################
-    dr_grade_from_eyepacs_artifact:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=train_artifact.csv
-            - n_classes=6
-            - model_name=resnet50
-            - pretrained=True
-            - base_loss=focal_loss
-            - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=0.001
-            - lambd=10
-            - exp=1
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=1/5/1/2/2/5 # for artifact
-            - decay_f=0.1
-            - metric=auc
-            - save_model=True
-            - n_epochs=100
-            - patience=10
-########################################################################################################################
-    dr_grade_from_eyepacs_quality:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=train_quality.csv
-            - n_classes=2
-            - model_name=resnet50
-            - pretrained=True
-            - base_loss=focal_loss
-            - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=0.001
-            - lambd=10
-            - exp=1
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=1/1 # for quality
-            - decay_f=0.1
-            - metric=auc
-            - save_model=True
-            - n_epochs=100
-            - patience=10
+

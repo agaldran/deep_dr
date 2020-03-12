@@ -2,7 +2,7 @@ import numpy as np
 import sys
 
 from sklearn.metrics import cohen_kappa_score as kappa, roc_auc_score
-from sklearn.metrics import confusion_matrix, balanced_accuracy_score
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score, accuracy_score
 
 
 
@@ -60,6 +60,7 @@ def ewma(data, window=5):
 
 def eval_predictions_multi(y_true, y_pred, y_proba):
     acc = balanced_accuracy_score(y_true, y_pred)
+    acc = accuracy_score(y_true, y_pred)
     if y_proba.shape[1] == 2:
         k = 0
         classes = ['R0', 'R1']
