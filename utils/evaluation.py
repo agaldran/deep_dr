@@ -60,13 +60,19 @@ def ewma(data, window=5):
 
 def eval_predictions_multi(y_true, y_pred, y_proba):
     acc = balanced_accuracy_score(y_true, y_pred)
-    k = kappa(y_true, y_pred, weights='quadratic')
-    classes = ['DR0', 'DR1', 'DR2', 'DR3', 'DR4']
-    # mean_auc = roc_auc_score(y_true, y_proba, average='weighted', multi_class='ovr')
-    # ovo should be better, but average is not clear from docs
-    # mean_auc = roc_auc_score(y_true, y_proba, average='macro', multi_class='ovo')
-    mean_auc = roc_auc_score(y_true, y_proba, average='weighted', multi_class='ovo')
-    cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2, 3, 4])
+    if y_proba.shape[1] == 2:
+        k = 0
+        classes = ['R0', 'R1']
+        mean_auc = roc_auc_score(y_true, y_proba[:, 1])
+        cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    else:
+        k = kappa(y_true, y_pred, weights='quadratic')
+        classes = ['DR0', 'DR1', 'DR2', 'DR3', 'DR4']
+        # mean_auc = roc_auc_score(y_true, y_proba, average='weighted', multi_class='ovr')
+        # ovo should be better, but average is not clear from docs
+        # mean_auc = roc_auc_score(y_true, y_proba, average='macro', multi_class='ovo')
+        mean_auc = roc_auc_score(y_true, y_proba, average='weighted', multi_class='ovo')
+        cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2, 3, 4])
     print_cm(cm, classes)
 
     return k, mean_auc, acc

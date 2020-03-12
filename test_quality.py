@@ -26,17 +26,17 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('boolean value expected.')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_test_od', type=str, default='data/test_od.csv', help='path to test OD data csv')
-parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', help='path to test MAC data csv')
+parser.add_argument('--csv_test_q', type=str, default='data/test_q.csv', help='path to test OD data csv')
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
-parser.add_argument('--load_path_od', type=str, default='experiments/best_od_11Mar', help='path to saved model - od')
-parser.add_argument('--load_path_mac', type=str, default='experiments/best_mac_11Mar', help='path to saved model - mac')
-parser.add_argument('--load_path_both', type=str, default='experiments/best_both_11Mar', help='path to saved model - od+mac')
+parser.add_argument('--load_path_quality', type=str, default='experiments/best_quality_11Mar', help='path to saved model - quality')
+parser.add_argument('--load_path_artifact', type=str, default='experiments/best_artifact_11Mar', help='path to saved model - artifact')
+parser.add_argument('--load_path_field_def', type=str, default='experiments/best_field_def_11Mar', help='path to saved model - field def')
+parser.add_argument('--load_path_clarity', type=str, default='experiments/best_clarity_11Mar', help='path to saved model - clarity')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
-parser.add_argument('--csv_out', type=str, default='results/results.csv', help='path to output csv')
+parser.add_argument('--csv_out', type=str, default='results/submission_quality_galdran_11Mar.csv', help='path to output csv')
 
 args = parser.parse_args()
 
@@ -77,12 +77,8 @@ def test_cls_tta_dihedral(model, test_loader, n=3):
 
     probs_tta = np.mean(np.array(probs_tta), axis=0)
     preds_tta = np.argmax(probs_tta, axis=1)
-    try:
-        test_k, test_auc, test_acc = eval_predictions_multi(test_labels, preds_tta, probs_tta)
-        print('Test Kappa: {:.4f} -- AUC: {:.4f} -- Balanced Acc: {:.4f}'.format(test_k, test_auc, test_acc))
-    except:
-        print('Test Kappa: {:.4f} -- AUC: {:.4f} -- Balanced Acc: {:.4f}'.format(0, 0, 0))
-
+    # test_k, test_auc, test_acc = eval_predictions_multi(test_labels, preds_tta, probs_tta)
+    # print('Test Kappa: {:.4f} -- AUC: {:.4f} -- Balanced Acc: {:.4f}'.format(test_k, test_auc, test_acc))
 
     del model
     torch.cuda.empty_cache()
@@ -103,8 +99,8 @@ def test_cls_tta(model, test_loader):
     probs_tta = np.mean(np.array(probs_tta), axis=0)
     preds_tta = np.argmax(probs_tta, axis=1)
 
-    test_k, test_auc, test_acc = eval_predictions_multi(test_labels, preds_tta, probs_tta)
-    print('Test Kappa: {:.4f} -- AUC: {:.4f} -- Balanced Acc: {:.4f}'.format(test_k, test_auc, test_acc))
+    # test_k, test_auc, test_acc = eval_predictions_multi(test_labels, preds_tta, probs_tta)
+    # print('Test Kappa: {:.4f} -- AUC: {:.4f} -- Balanced Acc: {:.4f}'.format(test_k, test_auc, test_acc))
 
     del model
     torch.cuda.empty_cache()
@@ -114,8 +110,8 @@ def test_cls(model, test_loader):
     # validate one epoch, note no optimizer is passed
     with torch.no_grad():
         preds, probs, labels = run_one_epoch_cls(test_loader, model)
-    vl_k, vl_auc, vl_acc = eval_predictions_multi(labels, preds, probs)
-    print('Val. Kappa: {:.4f} -- AUC: {:.4f}'.format(vl_k, vl_auc).rstrip('0'))
+    # vl_k, vl_auc, vl_acc = eval_predictions_multi(labels, preds, probs)
+    # print('Val. Kappa: {:.4f} -- AUC: {:.4f}'.format(vl_k, vl_auc).rstrip('0'))
 
     del model
     torch.cuda.empty_cache()
@@ -136,100 +132,117 @@ if __name__ == '__main__':
     # gather parser parameters
     args = parser.parse_args()
     model_name = args.model_name
-    load_path_od = args.load_path_od
-    load_path_mac = args.load_path_mac
-    load_path_both = args.load_path_both
+    load_path_quality = args.load_path_quality
+    load_path_artifact = args.load_path_artifact
+    load_path_field_def = args.load_path_field_def
+    load_path_clarity = args.load_path_clarity
     pretrained = args.pretrained
     bs = args.batch_size
-    csv_test_od = args.csv_test_od
-    csv_test_mac = args.csv_test_mac
+    csv_test_q = args.csv_test_q
     n_classes = args.n_classes
     tta = args.tta
     csv_out = args.csv_out
 
     ####################################################################################################################
-    # build results for od-centered with OD model
+    # build results for QUALITY model
+    n_classes = 2
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
 
-    model, stats = load_model(model, load_path_od, device='cpu')
+    model, stats = load_model(model, load_path_quality, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-
+    test_loader = get_test_loader(csv_path_test=csv_test_q,  batch_size=bs, mean=mean, std=std)
     if tta:
-        probs_od, preds_od, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_q, preds_q, labels = test_cls_tta_dihedral(model, test_loader, n=3)
     else:
-        probs_od, preds_od, labels = test_cls(model, test_loader)
-    # df_od = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_od), columns=['image_id', 'preds'])
+        probs_q, preds_q, labels = test_cls(model, test_loader)
+    df_quality = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_q), columns=['image_id', 'Overall quality'])
+    # df_quality.to_csv('quality.csv', index=False)
     ####################################################################################################################
-    # build results for od-centered with BOTH model
+    # build results for ARTIFACT model
+    n_classes = 6
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
 
-    model, stats = load_model(model, load_path_both, device='cpu')
+    model, stats = load_model(model, load_path_artifact, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_od, batch_size=bs, mean=mean, std=std)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_both, preds_both, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_a, preds_a, labels = test_cls_tta_dihedral(model, test_loader, n=3)
     else:
-        probs_both, preds_both, labels = test_cls(model, test_loader)
-
-    mean_probs = 0.75*probs_od + 0.25*probs_both
-    preds_both = np.argmax(mean_probs, axis=1)
-    df_od = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_both), columns=['image_id', 'preds'])
-
+        probs_a, preds_a, labels = test_cls(model, test_loader)
+    df_artifact = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_a), columns=['image_id', 'Artifact'])
+    def map_label_art(label):
+        if label == 0: return 0
+        elif label == 1: return 1
+        elif label == 2: return 4
+        elif label == 3: return 6
+        elif label == 4: return 8
+        else: return 10
+    df_artifact['Artifact'] = df_artifact['Artifact'].apply(map_label_art)
+    # df_artifact.to_csv('artifact.csv', index=False)
     ####################################################################################################################
-    # build results for macula-centered with MAC model
+    # build results for CLARITY model
+    n_classes = 5
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
 
-    model, stats = load_model(model, load_path_mac, device='cpu')
+    model, stats = load_model(model, load_path_clarity, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_mac, preds_mac, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_c, preds_c, labels = test_cls_tta_dihedral(model, test_loader, n=3)
     else:
-        probs_mac, preds_mac, labels = test_cls(model, test_loader)
-    # df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds), columns=['image_id', 'preds'])
+        probs_c, preds_c, labels = test_cls(model, test_loader)
+    df_clarity = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_c), columns=['image_id', 'Clarity'])
+    def map_label_clarity(lab):
+        if lab == 0: return 1
+        elif lab == 1: return 4
+        elif lab == 2: return 6
+        elif lab == 3: return 8
+        else: return 10
+    df_clarity['Clarity'] = df_clarity['Clarity'].apply(map_label_clarity)
+    # df_clarity.to_csv('clarity.csv', index=False)
     ####################################################################################################################
-    # build results for macula-centered with BOTH model
+    # build results for FIELD DEFINITION model
+    n_classes = 5
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
 
-    model, stats = load_model(model, load_path_both, device='cpu')
+    model, stats = load_model(model, load_path_field_def, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_both, preds_both, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_f, preds_f, labels = test_cls_tta_dihedral(model, test_loader, n=3)
     else:
-        probs_both, preds_both, labels = test_cls(model, test_loader)
+        probs_f, preds_f, labels = test_cls(model, test_loader)
+    df_field_def = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_f), columns=['image_id', 'Field definition'])
+    def map_label_fd(label):
+        if label == 0: return 1
+        elif label == 1: return 4
+        elif label == 2: return 6
+        elif label == 3: return 8
+        else: return 10
+    df_field_def['Field definition'] = df_field_def['Field definition'].apply(map_label_fd)
+    # df_field_def.to_csv('field_def.csv', index=False)
 
-    mean_probs = 0.75*probs_mac + 0.25*probs_both
-    preds_both = np.argmax(mean_probs, axis=1)
-    df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_both), columns=['image_id', 'preds'])
-    ####################################################################################################################
 
-    df_od['image_id'] = df_od['image_id'].apply(lambda x: x.split('/')[-1][:6])
-    df_mac['image_id'] = df_mac['image_id'].apply(lambda x: x.split('/')[-1][:6])
-    df_all = pd.concat([df_od, df_mac], axis=0)
 
-    # store final submission
-    path_subm_csv = 'results/Challenge1_upload.csv'
-    df_subm = pd.read_csv(path_subm_csv)
-
-    submission = pd.merge(df_subm, df_all, on="image_id")
-    submission.drop(['DR_Level'], axis=1, inplace=True)
-    submission.columns = ['image_id', 'DR_Level']
+    from functools import reduce
+    submission = reduce(lambda x, y: pd.merge(x, y, on='image_id'), [df_quality, df_artifact, df_clarity, df_field_def])
+    submission['image_id'] = submission['image_id'].apply(lambda x: x.split('/')[-1][:-4])
+    submission = submission[['Overall quality', 'Artifact', 'Clarity', 'Field definition', 'image_id']]
     submission.to_csv(csv_out, index=False)
+
 

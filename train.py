@@ -43,7 +43,7 @@ def compare_op(metric):
         return operator.gt, 0.25
     elif metric == 'loss':
         return operator.lt, np.inf
-    elif metric == 'dice':
+    elif metric == 'bal_acc':
         return operator.gt, 0
     else:
         raise NotImplementedError
@@ -62,12 +62,12 @@ def reduce_lr(optimizer, epoch, factor=0.1, verbose=True):
                   ' of group {} to {:.4e}.'.format(epoch, i, new_lr))
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_train', type=str, default='train_od.csv', help='path to training data csv')
+parser.add_argument('--csv_train', type=str, default='train_all.csv', help='path to training data csv')
 parser.add_argument('--model_name', type=str, default='resnet18', help='selected architecture')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--load_checkpoint', type=str, default='no', help='path to pre-trained checkpoint')
 parser.add_argument('--base_loss', type=str, default='gls', help='base loss function (ce)')
-parser.add_argument('--lambd', type=float, default=1, help='lagrange multiplier for ot_loss')
+parser.add_argument('--lambd', type=float, default=10, help='lagrange multiplier for ot_loss')
 parser.add_argument('--exp', type=float, default=2, help='matrix exponentiation M**exp')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
@@ -126,7 +126,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
     best_kappa, best_auc = 0,0
     for epoch in range(n_epochs):
         print('\n EPOCH: {:d}/{:d}'.format(epoch+1, n_epochs))
-        if oversample == [1, 1, 1]:
+        if np.max(np.unique(oversample)) == 1:
             tr_preds, tr_probs, tr_labels, tr_loss = run_one_epoch_cls(train_loader, model, train_criterion, optimizer)
         else:
             csv_train_path = train_loader.dataset.csv_path
@@ -140,8 +140,9 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
         tr_k, tr_auc, tr_acc = eval_predictions_multi(tr_labels, tr_preds, tr_probs)
         print('\n')
         vl_k, vl_auc, vl_acc = eval_predictions_multi(vl_labels, vl_preds, vl_probs)
-        print('Train/Val. Loss: {:.4f}/{:.4f} -- Kappa: {:.4f}/{:.4f} -- AUC: {:.4f}/{:.4f} -- LR={:.6f}'.format(
-                tr_loss, vl_loss, tr_k, vl_k, tr_auc, vl_auc, get_lr(optimizer)).rstrip('0'))
+        print('Train/Val. Loss: {:.4f}/{:.4f} -- Kappa: {:.4f}/{:.4f} -- AUC: {:.4f}/{:.4f} '
+              '-- Acc: {:.4f}/{:.4f}  -- LR={:.6f}'.format(
+                tr_loss, vl_loss, tr_k, vl_k, tr_auc, vl_auc, tr_acc, vl_acc, get_lr(optimizer)).rstrip('0'))
         # store performance for this epoch
         tr_losses.append(tr_loss)
         tr_aucs.append(tr_auc)
@@ -159,6 +160,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
         if metric =='auc': monitoring_metric = vl_auc
         elif metric =='loss': monitoring_metric = vl_loss
         elif metric == 'kappa': monitoring_metric = vl_k
+        elif metric == 'bal_acc': monitoring_metric = vl_acc
         elif metric == 'kappa_auc_avg': monitoring_metric = 0.5*(vl_k+vl_auc)
         else: sys.exit('Not a suitable metric for this task')
 
@@ -178,7 +180,8 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
         else:
             counter_since_checkpoint += 1
 
-        if decay_f != 0 and counter_since_checkpoint == 3*patience//4:
+        # if decay_f != 0 and counter_since_checkpoint == 3*patience//4:
+        if decay_f != 0 and counter_since_checkpoint == patience // 4:
             reduce_lr(optimizer, epoch, factor=decay_f, verbose=False)
             print(8 * '-', ' Reducing LR now ', 8 * '-')
 
@@ -196,7 +199,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
 if __name__ == '__main__':
     '''
     Example:
-    python train.py
+    python train.py --load_checkpoint resnext50_eyepacs_gls
     '''
     data_path = 'data'
     use_cuda = torch.cuda.is_available()
@@ -239,11 +242,17 @@ if __name__ == '__main__':
     else: experiment_path=None
 
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
-    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    if not pretrained:
+        model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    else:
+        model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=5)
+        if load_checkpoint != 'no':
+            print('* Loading weights from previous checkpoint={}'.format(load_checkpoint))
+            model, stats, optimizer_state_dict = load_model(model, load_checkpoint, device='cpu', with_opt=True)
+        if n_classes != 5:
+            num_ftrs = model.fc.in_features
+            model.fc = torch.nn.Linear(num_ftrs, n_classes)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
-    if load_checkpoint != 'no':
-        print('* Loading weights from previous checkpoint={}'.format(load_checkpoint))
-        model, stats, optimizer_state_dict = load_model(model, load_checkpoint, device='cpu', with_opt=True)
     model = model.to(device)
 
 
@@ -260,7 +269,7 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     else:
         sys.exit('not a valid optimizer choice')
-    if load_checkpoint != 'no':
+    if load_checkpoint != 'no' and n_classes == 5:
         optimizer.load_state_dict(optimizer_state_dict)
         for i, param_group in enumerate(optimizer.param_groups):
             param_group['lr'] = lr
@@ -268,9 +277,10 @@ if __name__ == '__main__':
     print('* Instantiating base loss function {}, lambda={}, exp={}'.format(
             base_loss, str(lambd).rstrip('0'), str(exp).rstrip('0')))
     if base_loss == 'no':
-        train_crit, val_crit = get_cost_sensitive_criterion(n_classes=n_classes, exp=1)
+        train_crit, val_crit = get_cost_sensitive_criterion(n_classes=n_classes, exp=exp)
     else:
-        train_crit, val_crit = get_cost_sensitive_regularized_criterion(base_loss=base_loss, n_classes=n_classes, lambd=lambd, exp=1)
+        train_crit, val_crit = get_cost_sensitive_regularized_criterion(base_loss=base_loss, n_classes=n_classes,
+                                                                        lambd=lambd, exp=exp)
 
     print('* Starting to train\n','-' * 10)
     m1, m2 = train_cls(model, optimizer, train_crit, val_crit, train_loader, val_loader,

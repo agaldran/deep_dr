@@ -26,12 +26,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('boolean value expected.')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_test_od', type=str, default='data/test_od.csv', help='path to test OD data csv')
-parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', help='path to test MAC data csv')
+parser.add_argument('--csv_test_od', type=str, default='data/test_od_UW.csv', help='path to test OD data csv')
+parser.add_argument('--csv_test_mac', type=str, default='data/test_mac_UW.csv', help='path to test MAC data csv')
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
-parser.add_argument('--load_path_od', type=str, default='experiments/best_od_11Mar', help='path to saved model - od')
-parser.add_argument('--load_path_mac', type=str, default='experiments/best_mac_11Mar', help='path to saved model - mac')
-parser.add_argument('--load_path_both', type=str, default='experiments/best_both_11Mar', help='path to saved model - od+mac')
+parser.add_argument('--load_path_od', type=str, default='experiments/best_od_UW_11Mar', help='path to saved model - od')
+parser.add_argument('--load_path_mac', type=str, default='experiments/best_mac_UW_11Mar', help='path to saved model - mac')
+parser.add_argument('--load_path_both', type=str, default='experiments/best_both_UW_11Mar', help='path to saved model - od+mac')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
@@ -124,7 +124,7 @@ def test_cls(model, test_loader):
 if __name__ == '__main__':
     '''
     Example:
-    python test.py --tta True --csv_out results/submission_galdran_11Mar.csv
+    python test.py --tta True --csv_out results/submission_UW_galdran_11Mar.csv
     '''
     data_path = 'data'
     use_cuda = torch.cuda.is_available()
@@ -182,7 +182,6 @@ if __name__ == '__main__':
     mean_probs = 0.75*probs_od + 0.25*probs_both
     preds_both = np.argmax(mean_probs, axis=1)
     df_od = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_both), columns=['image_id', 'preds'])
-
     ####################################################################################################################
     # build results for macula-centered with MAC model
     print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
@@ -220,16 +219,13 @@ if __name__ == '__main__':
     df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_both), columns=['image_id', 'preds'])
     ####################################################################################################################
 
-    df_od['image_id'] = df_od['image_id'].apply(lambda x: x.split('/')[-1][:6])
-    df_mac['image_id'] = df_mac['image_id'].apply(lambda x: x.split('/')[-1][:6])
+    df_od['image_id'] = df_od['image_id'].apply(lambda x: x.split('/')[-1][:-4])
+    df_mac['image_id'] = df_mac['image_id'].apply(lambda x: x.split('/')[-1][:-4])
     df_all = pd.concat([df_od, df_mac], axis=0)
-
     # store final submission
-    path_subm_csv = 'results/Challenge1_upload.csv'
+    path_subm_csv = 'results/Challenge3_upload.csv'
     df_subm = pd.read_csv(path_subm_csv)
-
     submission = pd.merge(df_subm, df_all, on="image_id")
-    submission.drop(['DR_Level'], axis=1, inplace=True)
-    submission.columns = ['image_id', 'DR_Level']
+    submission.drop(['DR_level'], axis=1, inplace=True)
+    submission.columns = ['image_id', 'DR_level']
     submission.to_csv(csv_out, index=False)
-

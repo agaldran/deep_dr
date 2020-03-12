@@ -3,6 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 import numpy as np
 import scipy.stats as stats2
+import sys
 try:
     from kornia.losses import FocalLoss as focal_loss
 except:
@@ -115,7 +116,9 @@ def compute_trivial_ot_loss(input, target, M):
                          .format(input.size(0), target.size(0)))
     device = input.device
     M = M.to(device)
-    return torch.diag(torch.matmul(input, M[:, target]))
+    return (M[target, :]*input.float()).sum(axis=-1)
+    # return torch.diag(torch.matmul(input, M[:, target]))
+
 
 def cost_sensitive_loss(input, target, M):
     if input.size(0) != target.size(0):
@@ -123,7 +126,9 @@ def cost_sensitive_loss(input, target, M):
                          .format(input.size(0), target.size(0)))
     device = input.device
     M = M.to(device)
-    return torch.diag(torch.matmul(input, M[:, target]))
+    return (M[target, :]*input.float()).sum(axis=-1)
+    # return torch.diag(torch.matmul(input, M[:, target]))
+
 
 class CostSensitiveLoss(nn.Module):
     def __init__(self,  n_classes, exp=1, normalization='softmax', reduction='mean'):
@@ -137,8 +142,20 @@ class CostSensitiveLoss(nn.Module):
         self.reduction = reduction
         x = np.abs(np.arange(n_classes, dtype=np.float32))
         M = np.abs((x[:, np.newaxis] - x[np.newaxis, :])) ** exp
+
+        # M_oph = np.array([
+        #                 [1469, 4, 5, 0, 0],
+        #                 [58, 62, 5, 0, 0],
+        #                 [22, 3, 118, 1, 0],
+        #                 [0, 0, 13, 36, 1],
+        #                 [0, 0, 0, 1, 15]
+        #                 ], dtype=np.float)
+        # M_difficulty = 1-np.divide(M_oph, np.sum(M_oph, axis=1)[:, None])
+        # M = 0.5 * M + 0.5 * M_difficulty
+
         M /= M.max()
         self.M = torch.from_numpy(M)
+
 
     def forward(self, logits, target):
         preds = self.normalization(logits)
@@ -164,10 +181,30 @@ class CostSensitiveRegularizedLoss(nn.Module):
         self.reduction = reduction
         x = np.abs(np.arange(n_classes, dtype=np.float32))
         M = np.abs((x[:, np.newaxis] - x[np.newaxis, :])) ** exp
+        
+        # M_oph = np.array([
+        #                 [1469, 4, 5,  0,  0],
+        #                 [58, 62,  5,  0,  0],
+        #                 [22, 3, 118,  1,  0],
+        #                 [0, 0,   13, 36,  1],
+        #                 [0, 0,    0,  1, 15]
+        #                 ], dtype=np.float)
+        # M_difficulty = 1-np.divide(M_oph, np.sum(M_oph, axis=1)[:, None])
+        # # M = 0.5 * M + 0.5 * M_difficulty
+        # M_difficulty[0, 3] = 9
+        # M_difficulty[0, 4] = 16
+        # M_difficulty[1, 3] = 4
+        # M_difficulty[1, 4] = 9
+        # M_difficulty[2, 4] = 4
+        # M_difficulty[3, 0] = 9
+        # M_difficulty[3, 1] = 4
+        # M_difficulty[4, 0] = 16
+        # M_difficulty[4, 1] = 9
+        # M_difficulty[4, 2] = 4
+        # M = M_difficulty
+        
         M /= M.max()
         self.M = torch.from_numpy(M)
-
-        import sys
         self.lambd = lambd
         self.base_loss = base_loss
 
@@ -211,7 +248,6 @@ class TrivialOT(nn.Module):
         M /= M.max()
         self.M = torch.from_numpy(M)
 
-        import sys
         self.lambd = lambd
         self.base_loss = base_loss
 

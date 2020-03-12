@@ -116,6 +116,9 @@ def get_test_loader(csv_path_test, batch_size=8, mean=None, std=None):
 def modify_dataset(train_loader, csv_train_path, keep_samples=2000):
     train_loader_new = copy.deepcopy(train_loader)  # note, otherwise we modify underlying dataset
     train_dr = pd.read_csv(csv_train_path)
+    sixth_class=False
+    if len(np.unique(train_dr.dr)) == 6:
+        sixth_class=True
 
     r0_ims = train_dr.loc[train_dr['dr'] == 0]
     nr_r0 = r0_ims.shape[0]
@@ -127,18 +130,27 @@ def modify_dataset(train_loader, csv_train_path, keep_samples=2000):
     nr_r3 = r3_ims.shape[0]
     r4_ims = train_dr.loc[train_dr['dr'] == 4]
     nr_r4 = r4_ims.shape[0]
+    if sixth_class:
+        r5_ims = train_dr.loc[train_dr['dr'] == 5]
+        nr_r5 = r5_ims.shape[0]
+
+
     if isinstance(keep_samples, numbers.Number):
         r0_subset = r0_ims.sample(n=keep_samples, replace=nr_r0 < keep_samples)
         r1_subset = r1_ims.sample(n=keep_samples, replace=nr_r1 < keep_samples)
         r2_subset = r2_ims.sample(n=keep_samples, replace=nr_r2 < keep_samples)
         r3_subset = r3_ims.sample(n=keep_samples, replace=nr_r3 < keep_samples)
-        r4_subset = r4_ims.sample(n=keep_samples, replace=r4_ims.shape[0] < keep_samples)
+        r4_subset = r4_ims.sample(n=keep_samples, replace=nr_r4 < keep_samples)
+        if sixth_class:
+            r5_subset = r5_ims.sample(n=keep_samples, replace=nr_r5 < keep_samples)
     elif isinstance(keep_samples, (list, tuple)):
         r0_subset = r0_ims.sample(n=int(keep_samples[0]*nr_r0), replace=nr_r0 < keep_samples[0]*nr_r0)
         r1_subset = r1_ims.sample(n=int(keep_samples[1]*nr_r1), replace=nr_r1 < keep_samples[1]*nr_r1)
         r2_subset = r2_ims.sample(n=int(keep_samples[2]*nr_r2), replace=nr_r2 < keep_samples[2]*nr_r2)
         r3_subset = r3_ims.sample(n=int(keep_samples[3]*nr_r3), replace=nr_r3 < keep_samples[3]*nr_r3)
         r4_subset = r4_ims.sample(n=int(keep_samples[4]*nr_r4), replace=nr_r4 < keep_samples[4]*nr_r4)
+        if sixth_class:
+            r5_subset = r5_ims.sample(n=int(keep_samples[5] * nr_r5), replace=nr_r5 < keep_samples[5] * nr_r5)
     else:
         sys.exit('keep_samples should be number, list, or tuple')
 
@@ -152,8 +164,14 @@ def modify_dataset(train_loader, csv_train_path, keep_samples=2000):
     print('R3 nr samples (duplicated): {:d}({:d})'.format(r3_subset.shape[0], duplicate.shape[0]))
     duplicate = r4_subset[r4_subset.duplicated()]
     print('R4 nr samples (duplicated): {:d}({:d})'.format(r4_subset.shape[0], duplicate.shape[0]))
+    if sixth_class:
+        duplicate = r5_subset[r5_subset.duplicated()]
+        print('R5 nr samples (duplicated): {:d}({:d})'.format(r5_subset.shape[0], duplicate.shape[0]))
 
     dfs = [r0_subset, r1_subset, r2_subset, r3_subset, r4_subset]
+    if sixth_class:
+        dfs.append(r5_subset)
+
     train_dr_under_oversampled = pd.concat(dfs)
     train_loader_new.dataset.im_list = train_dr_under_oversampled['image_id'].values
     train_loader_new.dataset.dr = train_dr_under_oversampled['dr'].values

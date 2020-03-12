@@ -137,10 +137,11 @@ if __name__ == "__main__":
     df['dr'] = df['dr'].astype(int)
 
     df['center'] = ['od' if '1.jpg' in n else 'mac' for n in list(df.image_id)]
-    df_od = df[df.center == 'od']
-    df_mac = df[df.center == 'mac']
-    df_od.drop(['center'], axis=1).to_csv(osp.join(path_data_out,'train_od.csv'), index=False)
-    df_mac.drop(['center'], axis=1).to_csv(osp.join(path_data_out, 'train_mac.csv'), index=False)
+    df_od = df[df.center == 'od'].drop(['center'], axis=1)
+    df_mac = df[df.center == 'mac'].drop(['center'], axis=1)
+    df_od.to_csv(osp.join(path_data_out, 'train_od.csv'), index=False)
+    df_mac.to_csv(osp.join(path_data_out, 'train_mac.csv'), index=False)
+    pd.concat([df_od, df_mac], axis=0).to_csv(osp.join(path_data_out, 'train_all.csv'), index=False)
     print('Training data prepared')
 
     print('Preparing validation data')
@@ -148,7 +149,7 @@ if __name__ == "__main__":
 
     df = pd.read_csv(csv_path)
     df = df.drop(['patient_id', 'Overall quality', 'patient_DR_Level',
-                  'Field definition.1', 'Field definition', 'Artifact'], axis=1)
+                  'Clarity', 'Field definition', 'Artifact'], axis=1)
     df.left_eye_DR_Level.fillna(0, inplace=True)
     df.right_eye_DR_Level.fillna(0, inplace=True)
     df['dr'] = df['left_eye_DR_Level'] + df['right_eye_DR_Level']
@@ -162,8 +163,8 @@ if __name__ == "__main__":
     im_list = df.abs_path
 
     num_ims = len(im_list)
-    Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
-                       for i in tqdm(range(num_ims)))
+    # Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
+    #                    for i in tqdm(range(num_ims)))
     image_ids = [osp.join(path_out_ims, im_name.split('/')[-1]) for im_name in im_list]
     df['image_id'] = image_ids
     df = df.drop(['abs_path'], axis=1)
@@ -171,11 +172,101 @@ if __name__ == "__main__":
     df['dr'] = df['dr'].astype(int)
 
     df['center'] = ['od' if '1.jpg' in n else 'mac' for n in list(df.image_id)]
-    df_od = df[df.center == 'od']
-    df_mac = df[df.center == 'mac']
-    df_od.drop(['center'], axis=1).to_csv(osp.join(path_data_out, 'val_od.csv'), index=False)
-    df_mac.drop(['center'], axis=1).to_csv(osp.join(path_data_out, 'val_mac.csv'), index=False)
+    df_od = df[df.center == 'od'].drop(['center'], axis=1)
+    df_mac = df[df.center == 'mac'].drop(['center'], axis=1)
+    df_od.to_csv(osp.join(path_data_out, 'val_od.csv'), index=False)
+    df_mac.to_csv(osp.join(path_data_out, 'val_mac.csv'), index=False)
+    pd.concat([df_od, df_mac], axis=0).to_csv(osp.join(path_data_out, 'val_all.csv'), index=False)
     print('Validation data prepared')
 
+    print('Preparing image quality data')
+    path_raw_data = '/home/agaldran/Desktop/data/deepdr_data/'
+    path_data_out = 'data/'
+
+    print('------------------------------------')
+    print('Preparing training data')
+    pd.options.mode.chained_assignment = None
+    csv_path = osp.join(path_raw_data, 'regular-fundus-training/regular-fundus-training.csv')
+    df = pd.read_csv(csv_path)
+    df = df.drop(['patient_id', 'left_eye_DR_Level', 'right_eye_DR_Level', 'patient_DR_Level'], axis=1)
+    abs_path = [osp.join(path_raw_data, n.replace('\\', '/')[1:]) for n in list(df.image_path)]
+    df['abs_path'] = abs_path
+    df = df.drop(['image_path'], axis=1)
+    im_list = df.abs_path
+    image_ids = [osp.join(path_out_ims, im_name.split('/')[-1]) for im_name in im_list]
+    df['image_id'] = image_ids
+    df = df.drop(['abs_path'], axis=1)
+
+    df_qual = df[['image_id', 'Overall quality']]
+    df_qual.columns = ['image_id', 'dr']
+    df_qual.to_csv(osp.join(path_data_out, 'train_quality.csv'), index=False)
+
+    def map_label_clarity(lab):
+        if lab == 1: return 0
+        elif lab == 4: return 1
+        elif lab == 6: return 2
+        elif lab == 8: return 3
+        else: return 4
+    df_clarity = df[['image_id', 'Clarity']]
+    df_clarity['dr'] = df_clarity['Clarity'].apply(map_label_clarity)
+    df_clarity = df_clarity.drop(['Clarity'], axis=1)
+    df_clarity.to_csv(osp.join(path_data_out, 'train_clarity.csv'), index=False)
+
+    def map_label_fd(label):
+        if label == 1: return 0
+        elif label == 4: return 1
+        elif label == 6: return 2
+        elif label == 8: return 3
+        else: return 4
+    df_field_def = df[['image_id', 'Field definition']]
+    df_field_def['dr'] = df_field_def['Field definition'].apply(map_label_fd)
+    df_field_def = df_field_def.drop(['Field definition'], axis=1)
+    ########### WARNING: DO NOT REWRITE THESE, MANUALLY MODIFIED TO MOVE A 0-CLASS EX TO THE VAL SET
+    # df_field_def.to_csv(osp.join(path_data_out,'train_field_def.csv'), index=False)
+
+    def map_label_art(label):
+        if label == 0: return 0
+        elif label == 1: return 1
+        elif label == 4: return 2
+        elif label == 6: return 3
+        elif label == 8: return 4
+        else: return 5
+    df_artifact = df[['image_id', 'Artifact']]
+    df_artifact['dr'] = df_artifact['Artifact'].apply(map_label_art)
+    df_artifact = df_artifact.drop(['Artifact'], axis=1)
+    df_artifact.to_csv(osp.join(path_data_out, 'train_artifact.csv'), index=False)
 
 
+    print('Preparing validation data')
+    csv_path = osp.join(path_raw_data, 'regular-fundus-validation/regular-fundus-validation.csv')
+    df = pd.read_csv(csv_path)
+    df = df.drop(['patient_id', 'left_eye_DR_Level', 'right_eye_DR_Level', 'patient_DR_Level'], axis=1)
+    abs_path = [osp.join(path_raw_data, n.replace('\\', '/')[1:]) for n in list(df.image_path)]
+    df['abs_path'] = abs_path
+    df = df.drop(['image_path'], axis=1)
+    im_list = df.abs_path
+    image_ids = [osp.join(path_out_ims, im_name.split('/')[-1]) for im_name in im_list]
+    df['image_id'] = image_ids
+    df = df.drop(['abs_path'], axis=1)
+
+    df_qual = df[['image_id', 'Overall quality']]
+    df_qual.columns = ['image_id', 'dr']
+    df_qual.to_csv(osp.join(path_data_out,'val_quality.csv'), index=False)
+
+    df_clarity = df[['image_id', 'Clarity']]
+    df_clarity['dr'] = df_clarity['Clarity'].apply(map_label_clarity)
+    df_clarity = df_clarity.drop(['Clarity'], axis=1)
+    df_clarity.to_csv(osp.join(path_data_out, 'val_clarity.csv'), index=False)
+
+    df_field_def = df[['image_id', 'Field definition']]
+    df_field_def['dr'] = df_field_def['Field definition'].apply(map_label_fd)
+    df_field_def = df_field_def.drop(['Field definition'], axis=1)
+    ########### WARNING: DO NOT REWRITE THESE, MANUALLY MODIFIED TO MOVE A 0-CLASS EX TO THE VAL SET
+    # df_field_def.to_csv('data/val_field_def.csv', index=False)
+
+    df_artifact = df[['image_id', 'Artifact']]
+    df_artifact['dr'] = df_artifact['Artifact'].apply(map_label_art)
+    df_artifact = df_artifact.drop(['Artifact'], axis=1)
+    df_artifact.to_csv(osp.join(path_data_out, 'val_artifact.csv'), index=False)
+
+    print('Done')
