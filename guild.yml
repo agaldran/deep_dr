@@ -134,19 +134,19 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_all_UW.csv,train_od_UW.csv,train_mac_UW.csv]
+            - csv_train=[train_od_UW.csv,train_mac_UW.csv]
             - model_name=resnet50
             - pretrained=True
-            - base_loss=[ce,gls]
-            - load_checkpoint=[models/resnet50_eyepacs] #
+            - base_loss=[ce,gls,focal_loss]
+            - load_checkpoint=[models/resnet50_eyepacs] # need to try also with "no", and then we can use other models!
             - lr=0.0001
-            - lambd=10
+            - lambd=[0,0.1,1,10]
             - exp=1
             - batch_size=8
             - optimizer=sgd
             - oversample=2/2/2/5/12 # for UW
             - decay_f=0.1
-            - metric=kappa
+            - metric=kappa # change to auc to see if we improve
             - save_model=True
             - n_epochs=100
             - patience=10
@@ -165,7 +165,7 @@
             - base_loss=[ce,focal_loss]
             - load_checkpoint=[no] #,models/resnet50_eyepacs
             - lr=[0.001,0.0001]
-            - lambd=0
+            - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
             - optimizer=sgd
@@ -185,12 +185,12 @@
           flags:
             - csv_train=train_artifact.csv
             - n_classes=6
-            - model_name=resnet50
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
-            - base_loss=[focal_loss]
-            - load_checkpoint=[no,models/resnet50_eyepacs]
-            - lr=0.001
-            - lambd=[0,0.1,1,10]
+            - base_loss=[ce,focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.001,0.0001]
+            - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
             - optimizer=sgd
@@ -210,12 +210,12 @@
           flags:
             - csv_train=[train_clarity.csv]
             - n_classes=5
-            - model_name=resnet50
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
-            - base_loss=[focal_loss]
-            - load_checkpoint=[no,models/resnet50_eyepacs]
-            - lr=0.001
-            - lambd=10
+            - base_loss=[ce,focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.001,0.0001]
+            - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
             - optimizer=sgd
@@ -236,12 +236,12 @@
           flags:
             - csv_train=[train_field_def.csv]
             - n_classes=5
-            - model_name=resnet50
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
-            - base_loss=[focal_loss]
-            - load_checkpoint=[no,models/resnet50_eyepacs]
-            - lr=0.001
-            - lambd=10
+            - base_loss=[ce,focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.001,0.0001]
+            - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
             - optimizer=sgd
