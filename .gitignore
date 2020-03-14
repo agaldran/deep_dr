@@ -6,7 +6,7 @@ __pycache__
 **.ipynb
 # Do not push data
 data
-results
+#results
 # Do not push pytorch models
 **.pth
 # Do not push pdfs (who knows)
