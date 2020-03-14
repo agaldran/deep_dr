@@ -134,20 +134,20 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_od_UW.csv,train_mac_UW.csv]
-            - model_name=resnet50
+            - csv_train=[train_mac_UW.csv]
+            - model_name=[resnet50]
             - pretrained=True
             - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs] # need to try also with "no", and then we can use other models!
+            - load_checkpoint=[experiments/best_mac_11Mar,models/resnet50_eyepacs] # need to try also with "no", and then we can use other models!
             - lr=0.0001
-            - lambd=[0,0.1,1,10]
+            - lambd=10
             - exp=1
             - batch_size=8
             - optimizer=sgd
             - oversample=2/2/2/5/12 # for UW
             - decay_f=0.1
             - metric=kappa # change to auc to see if we improve
-            - save_model=True
+            - save_model=False
             - n_epochs=100
             - patience=10
 
