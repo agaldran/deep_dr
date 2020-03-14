@@ -27,7 +27,10 @@ def str2bool(v):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--csv_test_q', type=str, default='data/test_q.csv', help='path to test OD data csv')
-parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
+parser.add_argument('--model_name_quality', type=str, default='resnet50_sws', help='selected architecture')
+parser.add_argument('--model_name_artifact', type=str, default='resnet50', help='selected architecture')
+parser.add_argument('--model_name_field_def', type=str, default='resnext50', help='selected architecture')
+parser.add_argument('--model_name_clarity', type=str, default='resnext50', help='selected architecture')
 parser.add_argument('--load_path_quality', type=str, default='experiments/best_quality_16Mar', help='path to saved model - quality')
 parser.add_argument('--load_path_artifact', type=str, default='experiments/best_artifact_16Mar', help='path to saved model - artifact')
 parser.add_argument('--load_path_field_def', type=str, default='experiments/best_field_def_16Mar', help='path to saved model - field def')
@@ -131,7 +134,10 @@ if __name__ == '__main__':
 
     # gather parser parameters
     args = parser.parse_args()
-    model_name = args.model_name
+    model_name_quality = args.model_name_quality
+    model_name_artifact = args.model_name_artifact
+    model_name_field_def = args.model_name_field_def
+    model_name_clarity = args.model_name_clarity
     load_path_quality = args.load_path_quality
     load_path_artifact = args.load_path_artifact
     load_path_field_def = args.load_path_field_def
@@ -146,8 +152,8 @@ if __name__ == '__main__':
     ####################################################################################################################
     # build results for QUALITY model
     n_classes = 2
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
-    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    print('* Instantiating QUALITY model {}, pretrained={}'.format(model_name_quality, pretrained))
+    model, mean, std = get_arch(model_name_quality, pretrained=pretrained, n_classes=n_classes)
 
     model, stats = load_model(model, load_path_quality, device='cpu')
     model = model.to(device)
@@ -163,8 +169,8 @@ if __name__ == '__main__':
     ####################################################################################################################
     # build results for ARTIFACT model
     n_classes = 6
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
-    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    print('* Instantiating ARTIFACT model {}, pretrained={}'.format(model_name_artifact, pretrained))
+    model, mean, std = get_arch(model_name_artifact, pretrained=pretrained, n_classes=n_classes)
 
     model, stats = load_model(model, load_path_artifact, device='cpu')
     model = model.to(device)
@@ -189,8 +195,8 @@ if __name__ == '__main__':
     ####################################################################################################################
     # build results for CLARITY model
     n_classes = 5
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
-    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    print('* Instantiating CLARITY model {}, pretrained={}'.format(model_name_clarity, pretrained))
+    model, mean, std = get_arch(model_name_clarity, pretrained=pretrained, n_classes=n_classes)
 
     model, stats = load_model(model, load_path_clarity, device='cpu')
     model = model.to(device)
@@ -214,8 +220,8 @@ if __name__ == '__main__':
     ####################################################################################################################
     # build results for FIELD DEFINITION model
     n_classes = 5
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
-    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    print('* Instantiating FIELD DEFINITION model {}, pretrained={}'.format(model_name_field_def, pretrained))
+    model, mean, std = get_arch(model_name_field_def, pretrained=pretrained, n_classes=n_classes)
 
     model, stats = load_model(model, load_path_field_def, device='cpu')
     model = model.to(device)
