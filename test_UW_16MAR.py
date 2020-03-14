@@ -35,7 +35,7 @@ parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, defaul
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
-parser.add_argument('--csv_out', type=str, default='results/results.csv', help='path to output csv')
+parser.add_argument('--csv_out', type=str, default='results/submission_UW_galdran_16Mar.csv.csv', help='path to output csv')
 
 args = parser.parse_args()
 
