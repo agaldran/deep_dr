@@ -31,12 +31,11 @@ parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', hel
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
 parser.add_argument('--load_path_od', type=str, default='experiments/best_od_11Mar', help='path to saved model - od')
 parser.add_argument('--load_path_mac', type=str, default='experiments/best_mac_11Mar', help='path to saved model - mac')
-parser.add_argument('--load_path_both', type=str, default='experiments/best_both_11Mar', help='path to saved model - od+mac')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
-parser.add_argument('--csv_out', type=str, default='results/results.csv', help='path to output csv')
+parser.add_argument('--csv_out', type=str, default='results/submission_galdran_16Mar.csv', help='path to output csv')
 
 args = parser.parse_args()
 
@@ -138,7 +137,6 @@ if __name__ == '__main__':
     model_name = args.model_name
     load_path_od = args.load_path_od
     load_path_mac = args.load_path_mac
-    load_path_both = args.load_path_both
     pretrained = args.pretrained
     bs = args.batch_size
     csv_test_od = args.csv_test_od
