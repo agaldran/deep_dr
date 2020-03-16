@@ -110,20 +110,20 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_od.csv,train_mac.csv] # train_all.csv,
+            - csv_train=[train_all.csv] #
             - model_name=resnet50
             - pretrained=True
             - base_loss=[gls,ce,focal_loss]
             - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=0.0001
+            - lr=[0.0001]
             - lambd=10
             - exp=[1,2]
             - batch_size=8
             - optimizer=sgd
             - oversample=1/4/2/2/7 # 1/2/2/4/9 for UW
             - decay_f=0.1
-            - metric=kappa
-            - save_model=True
+            - metric=[auc,kappa]
+            - save_model=False
             - n_epochs=100
             - patience=10
 
