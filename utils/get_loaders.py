@@ -20,6 +20,36 @@ def scale_to_mu_sigma_to_0_1(tensor):
     s = tensor.std()
     return tensor.sub(m).div(s)
 
+class QualityDataset(Dataset):
+    def __init__(self, csv_path, transforms=None, mean=None, std=None):
+        self.csv_path = csv_path
+        df = pd.read_csv(self.csv_path)
+        self.im_list = df.image_id
+        self.quality = df.quality.values
+        self.artifact = df.artifact.values
+        self.clarity = df.clarity.values
+        self.field_def = df.field_def.values
+        self.transforms = transforms
+        if mean is not None and std is not None:
+            self.normalize = Normalize(mean, std)
+        else:
+            self.normalize = lambda x: x
+    def __getitem__(self, index):
+        # load image and labels
+        img = Image.open(self.im_list[index])
+        label_quality = self.quality[index]
+        label_artifact = self.artifact[index]
+        label_clarity = self.clarity[index]
+        label_field_def = self.field_def[index]
+
+        if self.transforms is not None:
+            img = self.transforms(img)
+
+        return img, label_quality, label_artifact, label_clarity, label_field_def
+
+    def __len__(self):
+        return len(self.im_list)
+
 class DRDataset(Dataset):
     def __init__(self, csv_path, transforms=None, mean=None, std=None):
         self.csv_path = csv_path
@@ -46,11 +76,13 @@ class DRDataset(Dataset):
         return len(self.im_list)
 
 
-def get_train_val_datasets(csv_path_train, csv_path_val, mean=None, std=None, tg_size=(512,512)):
-
-    train_dataset = DRDataset(csv_path_train, mean=mean, std=std)
-
-    val_dataset = DRDataset(csv_path_val, mean=mean, std=std)
+def get_train_val_datasets(csv_path_train, csv_path_val, mean=None, std=None, tg_size=(512,512), qualities=False):
+    if qualities:
+        train_dataset = QualityDataset(csv_path_train, mean=mean, std=std)
+        val_dataset = QualityDataset(csv_path_val, mean=mean, std=std)
+    else:
+        train_dataset = DRDataset(csv_path_train, mean=mean, std=std)
+        val_dataset = DRDataset(csv_path_val, mean=mean, std=std)
 
     size = tg_size
     # required transforms
@@ -68,16 +100,18 @@ def get_train_val_datasets(csv_path_train, csv_path_val, mean=None, std=None, tg
     brightness, contrast, saturation, hue = 0.10, 0.10, 0.10, 0.
 
     jitter = tr.ColorJitter(brightness, contrast, saturation, hue)
-
-    train_transforms = tr.Compose([resize, jitter, scale_transl_rot, h_flip, v_flip, tensorizer])
+    if not qualities:
+        train_transforms = tr.Compose([resize, jitter, scale_transl_rot, h_flip, v_flip, tensorizer])
+    else:
+        train_transforms = tr.Compose([resize, scale_transl_rot, h_flip, v_flip, tensorizer])
     val_transforms = tr.Compose([resize, tensorizer])
     train_dataset.transforms = train_transforms
     val_dataset.transforms = val_transforms
-
-    for c in range(len(np.unique(train_dataset.dr))):
-        exs_train = np.count_nonzero(train_dataset.dr == c)
-        exs_val = np.count_nonzero(val_dataset.dr == c)
-        print('Found {:d}/{:d} train/val examples of class {:d}'.format(exs_train, exs_val, c))
+    if not qualities:
+        for c in range(len(np.unique(train_dataset.dr))):
+            exs_train = np.count_nonzero(train_dataset.dr == c)
+            exs_val = np.count_nonzero(val_dataset.dr == c)
+            print('Found {:d}/{:d} train/val examples of class {:d}'.format(exs_train, exs_val, c))
 
     return train_dataset, val_dataset
 
@@ -96,8 +130,8 @@ def get_test_dataset(csv_path_test, mean=None, std=None, tg_size=(512,512)):
     return test_dataset
 
 def get_train_val_loaders(csv_path_train, csv_path_val, batch_size=8,
-                          mean=None, std=None):
-    train_dataset, val_dataset = get_train_val_datasets(csv_path_train, csv_path_val, mean=mean, std=std)
+                          mean=None, std=None, qualities=False):
+    train_dataset, val_dataset = get_train_val_datasets(csv_path_train, csv_path_val, mean=mean, std=std, qualities=qualities)
 
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size * torch.cuda.device_count(),

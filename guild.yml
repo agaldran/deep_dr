@@ -258,7 +258,7 @@
             - exp=[1,2]
             - batch_size=8
             - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
+            - oversample=[1/1/1/4/8] # for UW_all
             - decay_f=0.1
             - metric=[auc]
             - save_model=False
@@ -281,7 +281,7 @@
             - exp=[1,2]
             - batch_size=8
             - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
+            - oversample=[1/1/1/4/8] # for UW_all
             - decay_f=0.1
             - metric=[kappa]
             - save_model=False
