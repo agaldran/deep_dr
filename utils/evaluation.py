@@ -59,6 +59,7 @@ def ewma(data, window=5):
     return out
 
 def eval_predictions_multi(y_true, y_pred, y_proba):
+    print(np.unique(y_true), np.unique(y_pred), y_true.dtype, y_pred.dtype, y_proba.dtype)
     acc = balanced_accuracy_score(y_true, y_pred)
     acc = accuracy_score(y_true, y_pred)
     if y_proba.shape[1] == 2:
