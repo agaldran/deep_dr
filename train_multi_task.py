@@ -116,10 +116,10 @@ def run_one_epoch_multi(loader, model, criterion, optimizer=None):
             _, preds_clarity = torch.max(probs_clarity, 1)
             _, preds_field_def = torch.max(probs_field_def, 1)
 
-            loss_quality = criterion(preds_quality, labels_quality)
-            loss_artifact = criterion(preds_artifact, labels_artifact)
-            loss_clarity = criterion(preds_clarity, labels_clarity)
-            loss_field_def = criterion(preds_field_def, labels_field_def)
+            loss_quality = criterion(logits_quality, labels_quality)
+            loss_artifact = criterion(logits_artifact, labels_artifact)
+            loss_clarity = criterion(logits_clarity, labels_clarity)
+            loss_field_def = criterion(logits_field_def, labels_field_def)
 
             loss = torch.mean(torch.stack([loss_quality,loss_artifact,loss_clarity,loss_field_def]))
 
