@@ -183,6 +183,7 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
             tr_preds_c, tr_probs_c, tr_labels_c, \
             tr_preds_f, tr_probs_f, tr_labels_f, \
             tr_loss = run_one_epoch_multi(train_loader_MOD, model, train_criterion, optimizer)
+
         # validate one epoch, note no optimizer is passed
         with torch.no_grad():
             vl_preds_q, vl_probs_q, vl_labels_q, \
@@ -190,7 +191,16 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
             vl_preds_c, vl_probs_c, vl_labels_c, \
             vl_preds_f, vl_probs_f, vl_labels_f, \
             vl_loss = run_one_epoch_multi(val_loader, model, val_criterion)
+        print(np.unique(vl_labels_q))
+        print(np.unique(vl_labels_a))
+        print(np.unique(vl_labels_c))
+        print(np.unique(vl_labels_f))
 
+        print(eval_predictions_multi(vl_labels_q, vl_preds_q, vl_probs_q))
+        print(eval_predictions_multi(vl_labels_a, vl_preds_a, vl_probs_a))
+        print(eval_predictions_multi(vl_labels_c, vl_preds_c, vl_probs_c))
+        print(eval_predictions_multi(vl_labels_f, vl_preds_f, vl_probs_f))
+        sys.exit()
 
 
         tr_k_q, tr_auc_q, tr_acc_q = eval_predictions_multi(tr_labels_q, tr_preds_q, tr_probs_q)
