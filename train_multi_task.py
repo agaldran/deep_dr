@@ -154,10 +154,10 @@ def run_one_epoch_multi(loader, model, criterion, optimizer=None):
             else: t.set_postfix(vl_loss="{:.4f}".format(float(run_loss)))
             t.update()
 
-    return np.stack(probs_all_quality), np.stack(preds_all_quality), np.stack(labels_all_quality), \
-           np.stack(probs_all_artifact), np.stack(preds_all_artifact), np.stack(labels_all_artifact), \
-           np.stack(probs_all_clarity), np.stack(preds_all_clarity), np.stack(labels_all_clarity), \
-           np.stack(probs_all_field_def), np.stack(preds_all_field_def), np.stack(labels_all_field_def), run_loss
+    return np.stack(preds_all_quality), np.stack(probs_all_quality), np.stack(labels_all_quality), \
+           np.stack(preds_all_artifact), np.stack(probs_all_artifact), np.stack(labels_all_artifact), \
+           np.stack(preds_all_clarity), np.stack(probs_all_clarity), np.stack(labels_all_clarity), \
+           np.stack(preds_all_field_def), np.stack(probs_all_field_def), np.stack(labels_all_field_def), run_loss
 
 def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, val_loader,
           oversample, n_epochs, metric, patience, decay_f, exp_path):
