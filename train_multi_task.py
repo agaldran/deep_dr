@@ -67,7 +67,7 @@ parser.add_argument('--model_name', type=str, default='resnet50', help='selected
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--load_checkpoint', type=str, default='no', help='path to pre-trained checkpoint')
 parser.add_argument('--base_loss', type=str, default='ce', help='base loss function (ce)')
-parser.add_argument('--lambd', type=float, default=10, help='lagrange multiplier for ot_loss')
+parser.add_argument('--lambd', type=float, default=0, help='lagrange multiplier for ot_loss')
 parser.add_argument('--exp', type=float, default=1, help='matrix exponentiation M**exp')
 parser.add_argument('--n_classes', type=int, default=18, help='number of target classes (2+6+5+5)')
 parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
