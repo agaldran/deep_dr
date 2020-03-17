@@ -73,7 +73,7 @@ parser.add_argument('--n_classes', type=int, default=18, help='number of target 
 parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--optimizer', type=str, default='sgd', help='sgd/adam')
-parser.add_argument('--oversample', type=str, default='1/1/1/1/1', help='oversampling per-class proportions')
+parser.add_argument('--oversample', type=str, default='1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1', help='oversampling per-class proportions')
 parser.add_argument('--n_epochs', type=int, default=50, help='total max epochs (1000)')
 parser.add_argument('--patience', type=int, default=5, help='epochs until early stopping (20)')
 parser.add_argument('--decay_f', type=float, default=0.1, help='decay factor after 3/4 of patience epochs (0=no decay)')
