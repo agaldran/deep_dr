@@ -316,7 +316,7 @@ if __name__ == '__main__':
 
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     train_loader, val_loader = get_train_val_loaders(csv_path_train=csv_train, csv_path_val=csv_val,
-                                                     batch_size=bs, mean=mean, std=std)
+                                                     batch_size=bs, mean=mean, std=std, qualities=True)
 
     if optimizer_choice == 'sgd':
         optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
