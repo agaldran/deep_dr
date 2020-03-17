@@ -132,10 +132,6 @@ def get_test_dataset(csv_path_test, mean=None, std=None, tg_size=(512,512)):
 def get_train_val_loaders(csv_path_train, csv_path_val, batch_size=8,
                           mean=None, std=None, qualities=False):
     train_dataset, val_dataset = get_train_val_datasets(csv_path_train, csv_path_val, mean=mean, std=std, qualities=qualities)
-    print(np.unique(train_dataset.quality))
-    print(np.unique(train_dataset.artifact))
-    print(np.unique(train_dataset.clarity))
-    print(np.unique(train_dataset.field_def))
 
     # train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size * torch.cuda.device_count(),
     #                           num_workers=8, pin_memory=True, shuffle=True)

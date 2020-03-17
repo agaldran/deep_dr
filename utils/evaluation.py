@@ -66,7 +66,7 @@ def eval_predictions_multi(y_true, y_pred, y_proba):
         classes = ['R0', 'R1']
         mean_auc = roc_auc_score(y_true, y_proba[:, 1])
         cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
-    elif y_proba.shape[1] == 5:
+    elif y_proba.shape[1] == 6:
         k = kappa(y_true, y_pred, weights='quadratic')
         classes = ['DR0', 'DR1', 'DR2', 'DR3', 'DR4', 'DR5']
         # mean_auc = roc_auc_score(y_true, y_proba, average='weighted', multi_class='ovr')
