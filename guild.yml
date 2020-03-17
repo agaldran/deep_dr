@@ -125,7 +125,7 @@
             - metric=[auc,kappa]
             - save_model=False
             - n_epochs=50
-            - patience=50
+            - patience=5
 ########################################################################################################################
     dr_grade_ALL:
       description:
