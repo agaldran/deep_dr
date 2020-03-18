@@ -39,7 +39,7 @@ parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, defaul
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
-parser.add_argument('--csv_out', type=str, default='results/submission_galdran_20Mar.csv', help='path to output csv')
+parser.add_argument('--csv_out', type=str, default='results/submission_UW_galdran_20Mar.csv', help='path to output csv')
 
 args = parser.parse_args()
 
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     csv_test_mac = args.csv_test_mac
     n_classes = args.n_classes
     tta = args.tta
-    csv_out = args.csv_out00
+    csv_out = args.csv_out
 
     ####################################################################################################################
     # build results for od-centered with OD_k model
