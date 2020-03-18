@@ -26,7 +26,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('boolean value expected.')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_test_q', type=str, default='data/test_q.csv', help='path to test OD data csv')
+parser.add_argument('--csv_test_q', type=str, default='data/test_q_mt.csv', help='path to test OD data csv')
 parser.add_argument('--model_name_MT', type=str, default='resnext50_sws', help='selected architecture')
 parser.add_argument('--load_path_MT', type=str, default='experiments/best_auc_MT_qualities_20Mar', help='path to saved model - MT')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
