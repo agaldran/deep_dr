@@ -134,7 +134,7 @@ def run_one_epoch_cls(loader, model, optimizer=None):
     return np.stack(preds_all), np.stack(probs_all), np.stack(labels_all)
 
 def test_cls_tta_dihedral_MT(model, test_loader, n=3):
-    probs_tta_q, probs_tta_a, probs_tta_c, probs_tta_f = []
+    probs_tta_q, probs_tta_a, probs_tta_c, probs_tta_f = [], [], [], []
     prs = [0, 1]
     import torchvision
     test_loader.dataset.transforms.transforms.insert(-1, torchvision.transforms.RandomRotation(0))
