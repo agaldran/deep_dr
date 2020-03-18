@@ -77,7 +77,7 @@ parser.add_argument('--oversample', type=str, default='1/1/1/1/1/1/1/1/1/1/1/1/1
 parser.add_argument('--n_epochs', type=int, default=50, help='total max epochs (1000)')
 parser.add_argument('--patience', type=int, default=5, help='epochs until early stopping (20)')
 parser.add_argument('--decay_f', type=float, default=0.1, help='decay factor after 3/4 of patience epochs (0=no decay)')
-parser.add_argument('--metric', type=str, default='kappa', help='which metric to monitor (kappa/auc/loss/kappa_auc_avg)')
+parser.add_argument('--metric', type=str, default='auc', help='which metric to monitor (kappa/auc/loss/kappa_auc_avg)')
 parser.add_argument('--save_model', type=str2bool, nargs='?', const=True, default=False, help='avoid saving anything')
 parser.add_argument('--save_path', type=str, default='date_time', help='path to save model (defaults to date/time')
 
