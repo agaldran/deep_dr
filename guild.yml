@@ -23,11 +23,11 @@
         - file: utils
         - file: models
         - file: results
-    train_multitask:
+    train_multi_task:
       # The default 'main' attribute is 'train' based on the
       # operation name. While we could omit this below, it's good
       # practice to specify it.
-      main: train_multitask
+      main: train_multi_task
 
       # In this configuration, we require the project 'data'
       # directory. Guild creates a symbolic link named 'data' to
@@ -323,7 +323,7 @@
             - exp=1
             - batch_size=8
             - optimizer=sgd
-            - oversample=1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
+           # - oversample=1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
             - decay_f=0.1
             - metric=auc
             - save_model=False
