@@ -328,8 +328,8 @@
             - decay_f=0.1
             - metric=auc
             - save_model=False
-            - n_epochs=300
-            - patience=15
+            - n_epochs=200
+            - patience=10
 
     dr_grade_from_eyepacs_quality:
       description:
