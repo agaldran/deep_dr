@@ -23,7 +23,21 @@
         - file: utils
         - file: models
         - file: results
+    train_multitask:
+      # The default 'main' attribute is 'train' based on the
+      # operation name. While we could omit this below, it's good
+      # practice to specify it.
+      main: train_multitask
 
+      # In this configuration, we require the project 'data'
+      # directory. Guild creates a symbolic link named 'data' to
+      # this directory in each run directory for the operation.
+      requires:
+        - file: data
+        - file: experiments
+        - file: utils
+        - file: models
+        - file: results
     test_experiment_class:
       description:
         This is a test experiment with one epoch to check that guild.ai works
@@ -292,6 +306,30 @@
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
+    dr_grade_from_eyepacs_quality_multi_task:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train_multi_task
+          flags:
+            - csv_train=train_all_qualities.csv
+            - n_classes=2
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
+            - pretrained=True
+            - base_loss=[ce,focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.001,0.0001]
+            - lambd=0 
+            - exp=1
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
+            - decay_f=0.1
+            - metric=auc
+            - save_model=False
+            - n_epochs=300
+            - patience=15
+
     dr_grade_from_eyepacs_quality:
       description:
         This is the main experiment on dr grading
