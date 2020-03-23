@@ -3,7 +3,7 @@ __pycache__
 **.idea
 # Ignore notebook checkpoints
 **.ipynb_checkpoints
-**.ipynb
+#**.ipynb
 # Do not push data
 data
 #results
