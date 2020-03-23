@@ -37,7 +37,7 @@ parser.add_argument('--load_path_artifact', type=str, default='experiments/best_
 parser.add_argument('--load_path_field_def', type=str, default='experiments/best_field_def_16Mar', help='path to saved model - field def')
 parser.add_argument('--load_path_clarity', type=str, default='experiments/best_clarity_16Mar', help='path to saved model - clarity')
 
-parser.add_argument('--csv_test_q', type=str, default='data/test_q_mt.csv', help='path to test OD data csv')
+parser.add_argument('--csv_test_q_MT', type=str, default='data/test_q_mt.csv', help='path to test OD data csv')
 parser.add_argument('--model_name_MT', type=str, default='resnext50_sws', help='selected architecture')
 parser.add_argument('--load_path_MT', type=str, default='experiments/best_auc_MT_qualities_20Mar', help='path to saved model - MT')
 
@@ -221,6 +221,8 @@ if __name__ == '__main__':
 
     # gather parser parameters
     args = parser.parse_args()
+
+    csv_test_q_MT = args.csv_test_q_MT
     model_name_MT = args.model_name_MT
     load_path_MT = args.load_path_MT
 
@@ -250,7 +252,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q,  batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q_MT,  batch_size=bs, mean=mean, std=std, qualities=True)
 
     probs_tta_q, preds_tta_q, probs_tta_a, preds_tta_a, probs_tta_c, preds_tta_c, probs_tta_f, preds_tta_f \
         = test_cls_tta_dihedral_MT(model, test_loader, n=3)
