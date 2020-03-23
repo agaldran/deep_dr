@@ -1,0 +1,39 @@
+\section{Methodology}
+In this work, we consider a standard CNN archtitecture, namely ResNet-50 \cite{he_deep_2016}, as it
+has established in recent years as a standard in computer vision applications. \textit{ResNet 50}, introduced in \cite{he_deep_2016}, is part of the family of residual neural networks, the key contribution of which was the addition of \textit{skip connections}. Skip connections address the well-known vanishing gradient problem: in very deep neural networks, the weights in early layers of the network are not properly updated. This is due to the backpropagation algorithm propagating increasingly smaller error gradient values. Skip connections help in preserving the error gradient by allowing to backpropagate through an identity mapping instead of through standard layers. 
+This is achieved within a residual block through the mapping of input features $x$ to output features $H(x)$ by means of the following formula:
+\begin{equation*}
+H(x) = F(x)+x,
+\end{equation*}
+where $x\mapsto F(x)$ is a standard neural network layer. In this case, if during the training stage it is found that backpropagating the error signal through $F$ is harmful for the model performance, the training process can be automatically corrected to deviate through the identity mapping $H(x)=x$, which will not modify the error gradient values at all.
+
+By stacking residual blocks, ResNets with up to several hundred convolutional layers can be trained. 
+However, no significant improvement is achieved by using such a large amount of layers. 
+Hence, in this work we restrict ourselves to a 50-layers residual network, which is one of the standard architectures employed nowadays in computer vision.
+
+Our main novelty (submitted for consideration to MICCAI 2020) is the introduction of Cost-Sensitive Regularization in the training process. We consider as our base loss function $\mathcal{L}$ the well-known focal loss [X]:
+\begin{equation}
+\mathcal{L}(p,y) = -\alpha (y \cdot p)^\gamma \log(p)
+\end{equation}
+We then expand the above loss function by a cost-sensitive term given by:
+\begin{equation}
+\mathcal{L}_{CS}(p,y) = \mathcal{L}(p,y) + \lambda \langle M[y[i],:]\cdot x\rangle
+\end{equation}
+where $M$ is a ground-cost matrix defined as:
+\begin{equation}
+M(i,j) = \|i-j\|,
+\end{equation}
+and $M[y[i],:]$ denotes the row in $M$ associated to the corresponding label.
+
+Our model was trained based on the above loss function and architecture for each of the two image subsets (OD-centered and macula-centered), and predictions on each subset where combined into our submission. Training details and extra technical clarifications will be provided in future versions of this document.
+
+%\subsection{Fine-Tuning for UW-image recognition}
+%All three CNN models used in this work were pre-trained on ImageNet and fine-tuned to the available training data by minimizing the cross entropy loss.
+%We used the Adam \cite{kingma_adam:_2015} optimizer with a learning rate of $1E^{-3}$ and default $\beta_1$ and $\beta_2$ values ($\beta_1 = 0.9$, $\beta_2 = 0.999$).
+%The learning rate was decayed by $0.1$ after every $7$ epochs.
+%Early stopping was used with a patience of $5$ by monitoring Area Under the ROC Curve (AUC) on a separate validation set.
+%Input images were resized to $299\times487$ pixels to keep the original aspect ratio.
+%Finally, we used standard dataset augmentation operations such as random translations, scaling and horizontal flips.
+
+
+

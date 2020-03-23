@@ -1,0 +1,40 @@
+\section{Experimental Evaluation}
+\subsection{Data}
+For benchmarking the three models described in the previous section, we employ the recent introduced NBI-InfFrames dataset \cite{moccia_learning-based_2018}.  This dataset contains $720$ video frames obtained from 18 NBI laryngoscopic videos of 18 different patients. All of them were affected by laryngeal spinocellular carcinoma, as confirmed by further histopathological examination. Video acquisition was performed with a Narrow Band Imaging endoscope at a frame rate of 25 frames per second and a resolution of $1920\times1072$ pixels. From the $720 $ available samples, $180$ were Informative (\textbf{I}), $180$ were considered as Blurred (\textbf{B}), $180$ were declared as containing Saliva or Specular reflections (\textbf{S}), and $180$ were deemed as underexposed (\textbf{U}) by two different medical experts, see Fig. \ref{fig_samples}.
+
+The  NBI-InfFrames dataset comes already divided into three different folds, carefully constructed to separate frames patient-wise into different folds. In our case, for each considered model we performed three different training stages. In each stage, one fold was employed for training the model, another one for validation purposes, and the third fold was used for testing the performance of the model. This was repeated three times, suitably varying the corresponding test fold.
+
+
+
+\subsection{Quantitative Evaluation}
+For a numerical evaluation of the performance achieved by each model, we computed True Positive Rate and False Positive Rate averaged over the three experiments described above. From this, and given that the dataset was balanced, we built macro-average ROC curves for each of them. The resulting curves are shown in Fig. \ref{fig_rocs}, together with the corresponding Area Under the Curve (AUC) values. 
+
+\input{fig_rocs}
+
+From the previous experiment, we can observe that the three models achieved a high performance in the task of discriminating among the four classes of interest. Interestingly, the fine-tuned SqueezeNet model obtained the largest performance, with a nearly perfect AUC. For this reason, we selected this model as the best-performing one and further studied its performance in each class of interest, with a similar analysis as the one offered in \cite{moccia_learning-based_2018}. For this, after thresholding predictions at $t=0.5$, we computed True Positives ($\textrm{TP}_j$), False Positives ($\textrm{FP}_j$), and False Negatives ($\textrm{FN}_j$) for each class $j\in\{1,2,3,4\}$. With this, per-class Precision, Recall, and F1 scores were computed as follows:
+\begin{gather*} 
+\textrm{Precision}_j = \frac{\displaystyle \textrm{TP}_j}{\textrm{TP}_j+\textrm{FP}_j} ,
+\quad \quad \quad 
+\textrm{Recall}_j = \frac{\displaystyle \textrm{TP}_j}{\displaystyle \textrm{TP}_j+\textrm{FN}_j},
+\\
+\textrm{F1}_j = 2\cdot
+\frac{\displaystyle \textrm{Precision}_j\cdot \textrm{Recall}_j}
+{\displaystyle\textrm{Precision}_j + \textrm{Recall}_j}.
+\end{gather*}
+Table \ref{tab_1_results} shows the result of computing the above performance measures for the SqueezeNet-based model, with results reported in \cite{moccia_learning-based_2018} for the same task and equal experimental setting.
+
+
+
+In addition to analyzing how accurate predictions were for each class, we were also interested in studying the time required for each model to produce a prediction given an input frame. 
+These inference times are shown in Table \ref{tab_2_time} for each of the three considered techniques, together with the execution time reported in \cite{moccia_learning-based_2018}. 
+It should be noticed that the latter was not obtained by running the method in a computer with the same specifications as the first three. 
+In particular, inference times in this paper are reported for a GPU-based computation with a NVIDIA GeForce GTX 1060, by testing each model with a batch size of $1$.
+Increasing the batch size further decreases the mean inference time due to a better exploitation of the parallel computing capabilities of GPUs.
+
+\input{table_2_time}
+
+
+
+
+
+
