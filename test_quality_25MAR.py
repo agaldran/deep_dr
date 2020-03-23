@@ -366,5 +366,11 @@ if __name__ == '__main__':
     submission = reduce(lambda x, y: pd.merge(x, y, on='image_id'), [df_quality, df_artifact, df_clarity, df_field_def])
     submission['image_id'] = submission['image_id'].apply(lambda x: x.split('/')[-1][:-4])
     submission = submission[['Overall quality', 'Artifact', 'Clarity', 'Field definition', 'image_id']]
+
+    df_good = pd.read_csv('results/Challenge2_upload.csv')
+    submission_good = pd.merge(df_good, submission, on="image_id")
+    submission_good = submission_good.drop(['Overall quality_x', 'Artifact_x', 'Clarity_x', 'Field definition_x'], axis=1)
+    submission_good.columns = ['image_id', 'Overall quality', 'Artifact', 'Clarity', 'Field definition']
+    submission_good = submission_good[['Overall quality', 'Artifact', 'Clarity', 'Field definition','image_id']]
     # submission.to_csv(csv_out, index=False)
-    submission.to_csv('all_qualities_results_debug.csv', index=False)
+    submission_good.to_csv('all_qualities_results_good.csv', index=False)
