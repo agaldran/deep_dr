@@ -45,7 +45,7 @@ parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, defaul
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
-parser.add_argument('--csv_out', type=str, default='results/submission_quality_galdran_20Mar.csv', help='path to output csv')
+parser.add_argument('--csv_out', type=str, default='results/submission_quality_galdran_25Mar.csv', help='path to output csv')
 
 args = parser.parse_args()
 
@@ -276,7 +276,6 @@ if __name__ == '__main__':
     mean_probs_q = 0.5 * probs_tta_q + 0.5 * probs_q
     preds_q = np.argmax(mean_probs_q, axis=1)
     df_quality = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_q), columns=['image_id', 'Overall quality'])
-    df_quality.to_csv('quality.csv', index=False)
     ####################################################################################################################
     # build results for ARTIFACT model
     n_classes = 6
@@ -357,10 +356,10 @@ if __name__ == '__main__':
         else: return 10
     df_field_def['Field definition'] = df_field_def['Field definition'].apply(map_label_fd)
 
-    df_quality.to_csv('quality_results_debug.csv', index=False)
-    df_artifact.to_csv('artifact_results_debug.csv', index=False)
-    df_clarity.to_csv('clarity_results_debug.csv', index=False)
-    df_field_def.to_csv('field_def_results_debug.csv', index=False)
+    # df_quality.to_csv('quality_results_debug.csv', index=False)
+    # df_artifact.to_csv('artifact_results_debug.csv', index=False)
+    # df_clarity.to_csv('clarity_results_debug.csv', index=False)
+    # df_field_def.to_csv('field_def_results_debug.csv', index=False)
 
     from functools import reduce
     submission = reduce(lambda x, y: pd.merge(x, y, on='image_id'), [df_quality, df_artifact, df_clarity, df_field_def])
@@ -372,5 +371,4 @@ if __name__ == '__main__':
     submission_good = submission_good.drop(['Overall quality_x', 'Artifact_x', 'Clarity_x', 'Field definition_x'], axis=1)
     submission_good.columns = ['image_id', 'Overall quality', 'Artifact', 'Clarity', 'Field definition']
     submission_good = submission_good[['Overall quality', 'Artifact', 'Clarity', 'Field definition','image_id']]
-    # submission.to_csv(csv_out, index=False)
-    submission_good.to_csv('all_qualities_results_good.csv', index=False)
+    submission_good.to_csv(csv_out, index=False)
