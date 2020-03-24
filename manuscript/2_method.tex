@@ -9,9 +9,9 @@ Our goal is to introduce in the loss computation of a standard CNN trained by ba
 A simple approach to achieve such increasing label-dependent penalty is by encoding in each row of $M$ those costs, and then computing the scalar product of $\hat{y}$ with the row of $M$ corresponding to $y$, i.e. $\mathcal{L}(y,\hat{y})=\langle M(y,\cdot), \hat{y} \rangle$. 
 However, due to the high imbalance of the DR grading problem (with typically few examples of classes DR1, DR3, and DR4) in our experiments we prefer to combine a Cost-Sensitive term with a base loss as follows:
 \begin{equation}\label{cs_loss}
-\mathcal{L}^{cs}(y,\hat{y}) = \mathcal{L}^{base}(\hat{y},y) + \lambda \langle M^{(2)}(y,\cdot), \hat{y} \rangle, \ \ \  M^{(2)}_{ij}=\|i-j\|_2^2.
+\mathcal{L}^{cs}(y,\hat{y}) = \mathcal{L}^{base}(\hat{y},y) + \lambda \langle M^{(2)}(y,\cdot), \hat{y} \rangle, \ \ \  M_{ij}=\|i-j\|_2.
 \end{equation}
-In the above equation, we have selected the $L^2$-based ground cost matrix $M^{(2)}$, since it fits nicely with the goal of maximizing quadratic-weighted kappa score, which is the main performance metric in this competition.
+In the above equation, we have selected the $L^1$-based ground cost matrix $M$, since in our internal validation experiments we noticed this configuration was the one attaining greater quadratic-weighted kappa score, which is the main performance metric in this competition.
 
 In this work, we consider a standard CNN archtitecture, namely ResNet-50 \cite{he_deep_2016}, as it
 has established in recent years as a standard in computer vision applications. 
