@@ -48,7 +48,14 @@ ${\ddagger}$ Diagnos INC., Quebec, Canada
 \maketitle
 %
 \begin{abstract}
-This is a short description of the method employed by our team to address the DEEP-DR challenge. It will be expanded and improved in the following days to account for our full solution including the three sub-challenges.
+This short paper includes a description of the method employed by our team to address the DEEP-DR challenge. 
+We participate in each of the three sub-challenges.
+While our solution for sub-challenge 1 (DR grading from fundus images) and sub-challenge 3 (DR grading from UW images) is based on similar ideas, we introduce a different strategy for sub-challenge 2 (fundus image quality assessment). 
+In the first case, we rely on a methodology based on Cost-Sensitive regularization adapted to standard CNNs for better performing DR grading. 
+This consists of attaching an extra term that acts as a regularizer to standard classification losses, with the goal of imposing greater penalties on predicted grades when they are farther away from the true grade associated to a particular image.
+For the latter, we train five different CNNs, four of them meant to solve each of the sub-tasks in sub-challenge 2 independently, and a fifth one that solves the four sub-tasks simultaneously, sharing the same convolutional weights and internal representation but with four different predictive streams in the last part of the architecture.
+Our approach performs reasonably well in our internal validation tests as well as in the online validation set. 
+Code to reproduce our results is released at \url{github.com/agaldran/deepdr}.
 \end{abstract}
 %
 \begin{keywords}
@@ -63,9 +70,9 @@ Diabetic Retinopathy Grading, Cost-Sensitive Classification, Retinal Image Quali
 %
 %\input{table_1_results}
 %
-%\input{3_evaluation}
+\input{3_evaluation}
 %
-%\input{4_discusion}
+\input{4_discusion}
 
 %\input{5_conclusion}
 

@@ -10,11 +10,31 @@ B.~J. Fenner, R.~L.~M. Wong, W.-C. Lam, G.~S.~W. Tan, and G.~C.~M. Cheung.
   {Retinopathy} {Screening}: {A} {Review}.
 \newblock {\em Ophthalmology and Therapy}, 7(2):333--346, Dec. 2018.
 
+\bibitem{galdran_non-uniform_2020}
+A.~Galdran, J.~Chelbi, R.~Kobi, J.~Dolz, H.~Lombaert, I.~ben Ayed, and
+  C.~Chakor.
+\newblock Non-{Uniform} {Label} {Smoothing} for {Diabetic} {Retinopathy}
+  {Grading} from {Retinal} {Fundus} {Images} with {Deep} {Neural} {Networks}.
+\newblock {\em Translational vision science and technology - under review},
+  Mar. 2020.
+
+\bibitem{galdran_cost-sensitive_2020}
+A.~Galdran, J.~Dolz, H.~Chakor, H.~Lombaert, and I.~ben Ayed.
+\newblock Cost-{Sensitive} {Regularization} for {Diabetic} {Retinopathy}
+  {Grading} from {Eye} {Fundus} {Images}.
+\newblock In {\em {MICCAI} 2020 (under review)}, 2020.
+
 \bibitem{he_deep_2016}
 K.~He, X.~Zhang, S.~Ren, and J.~Sun.
 \newblock Deep {Residual} {Learning} for {Image} {Recognition}.
 \newblock In {\em 2016 {IEEE} {Conference} on {Computer} {Vision} and {Pattern}
   {Recognition} ({CVPR})}, pages 770--778, June 2016.
 \newblock ISSN: 1063-6919.
+
+\bibitem{lin_focal_2020}
+T.-Y. Lin, P.~Goyal, R.~Girshick, K.~He, and P.~Dollár.
+\newblock Focal {Loss} for {Dense} {Object} {Detection}.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  42(2):318--327, Feb. 2020.
 
 \end{thebibliography}

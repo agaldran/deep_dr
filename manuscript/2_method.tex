@@ -1,39 +1,42 @@
 \section{Methodology}
+\subsection{DR grading from standard Eye Fundus Images}
+For the DR grading, labels are distributed in an heterogeneous manner, as a consequence of the structure underlying the diagnosis of this disease.
+As an example, a image annotated as Mild DR has a label closer to the label of a healthy image than to the label of an image showing signs of Proliferative DR.
+For this reason, we employ a special technique that accounts for such label structure, which we have introduced in \cite{galdran_cost-sensitive_2020}.
+Briefly, we consider a model $U$ producing a prediction $U(x)=\hat{y} \in [0,1]\times \displaystyle \ldots \times[0,1]$, and an associated ground-truth label $y$. 
+
+Our goal is to introduce in the loss computation of a standard CNN trained by backpropgation a cost matrix $M$ that encodes a null cost for a prediction such that $\hat{y}=y_j$, but cost that increases along with the distance $\|y - \hat{y}\|$. 
+A simple approach to achieve such increasing label-dependent penalty is by encoding in each row of $M$ those costs, and then computing the scalar product of $\hat{y}$ with the row of $M$ corresponding to $y$, i.e. $\mathcal{L}(y,\hat{y})=\langle M(y,\cdot), \hat{y} \rangle$. 
+However, due to the high imbalance of the DR grading problem (with typically few examples of classes DR1, DR3, and DR4) in our experiments we prefer to combine a Cost-Sensitive term with a base loss as follows:
+\begin{equation}\label{cs_loss}
+\mathcal{L}^{cs}(y,\hat{y}) = \mathcal{L}^{base}(\hat{y},y) + \lambda \langle M^{(2)}(y,\cdot), \hat{y} \rangle, \ \ \  M^{(2)}_{ij}=\|i-j\|_2^2.
+\end{equation}
+In the above equation, we have selected the $L^2$-based ground cost matrix $M^{(2)}$, since it fits nicely with the goal of maximizing quadratic-weighted kappa score, which is the main performance metric in this competition.
+
 In this work, we consider a standard CNN archtitecture, namely ResNet-50 \cite{he_deep_2016}, as it
-has established in recent years as a standard in computer vision applications. \textit{ResNet 50}, introduced in \cite{he_deep_2016}, is part of the family of residual neural networks, the key contribution of which was the addition of \textit{skip connections}. Skip connections address the well-known vanishing gradient problem: in very deep neural networks, the weights in early layers of the network are not properly updated. This is due to the backpropagation algorithm propagating increasingly smaller error gradient values. Skip connections help in preserving the error gradient by allowing to backpropagate through an identity mapping instead of through standard layers. 
-This is achieved within a residual block through the mapping of input features $x$ to output features $H(x)$ by means of the following formula:
-\begin{equation*}
-H(x) = F(x)+x,
-\end{equation*}
-where $x\mapsto F(x)$ is a standard neural network layer. In this case, if during the training stage it is found that backpropagating the error signal through $F$ is harmful for the model performance, the training process can be automatically corrected to deviate through the identity mapping $H(x)=x$, which will not modify the error gradient values at all.
+has established in recent years as a standard in computer vision applications. 
+We train this model by using the above regularization and several loss functions as a base error measure, namely Cross-Entropy, Focal Loss \cite{lin_focal_2020}, and Non-Uniform Label Smoothing \cite{galdran_non-uniform_2020}. 
+Our models are trained starting from weights pre-trained for the Kaggle Eyepacs competition dataset, based on the above loss function and architecture for each of the two image subsets (OD-centered and macula-centered) independently. 
+In addition, we also train a third model on the entire dataset (OD+Macula). 
+In test time, for a particular image centered, e.g., in the OD, we combine predictions coming from models trained on OD-centered images with predictions coming from training on both kind of images.
 
-By stacking residual blocks, ResNets with up to several hundred convolutional layers can be trained. 
-However, no significant improvement is achieved by using such a large amount of layers. 
-Hence, in this work we restrict ourselves to a 50-layers residual network, which is one of the standard architectures employed nowadays in computer vision.
+\subsection{Fine-Tuning for UW-image recognition}
+The Ultra-Wide Field retinal image dataset on this sub-challenge contains significantly less training examples than the standard fundus image dataset.
+For this reason, we fine-tune our best models from the previous section on this new task, again using Cost-Senstive regularization.
+In addition, we keep the same strategy as outlined above: we train separate models for OD-centered images, macula-centered  images, and a combination of both.
 
-Our main novelty (submitted for consideration to MICCAI 2020) is the introduction of Cost-Sensitive Regularization in the training process. We consider as our base loss function $\mathcal{L}$ the well-known focal loss [X]:
-\begin{equation}
-\mathcal{L}(p,y) = -\alpha (y \cdot p)^\gamma \log(p)
-\end{equation}
-We then expand the above loss function by a cost-sensitive term given by:
-\begin{equation}
-\mathcal{L}_{CS}(p,y) = \mathcal{L}(p,y) + \lambda \langle M[y[i],:]\cdot x\rangle
-\end{equation}
-where $M$ is a ground-cost matrix defined as:
-\begin{equation}
-M(i,j) = \|i-j\|,
-\end{equation}
-and $M[y[i],:]$ denotes the row in $M$ associated to the corresponding label.
+\subsection{Image Quality Assessment from Retinal Fundus Images}
+This sub-challenge encompasses four different sub-tasks, each of them accounting for a different kind of image degradation,and the task is to categorize each degradation into a variable number of classes, ranging from two (Overall Quality) to six (Field Definition). 
 
-Our model was trained based on the above loss function and architecture for each of the two image subsets (OD-centered and macula-centered), and predictions on each subset where combined into our submission. Training details and extra technical clarifications will be provided in future versions of this document.
+In order to potentially improve generalization ability, we train five different models on the available training data. 
+First, we train four different image quality assessment models meant to solve each of the four different sub-tasks independently. 
+Then we train a last model that solves jointly the four problems. This is done by implementing four different prediction branches towards the end of our architecture, as illustrated in Fig. \ref{fig_architecture}.
+In test time, for each sub-task we combine predictions generated from the model trained specifically for that particular task with the model trained in a multi-task manner.
+We hypothesize that this approach contributes to the learning of useful representations that can take advantage of certain correlation existing between the different sub-tasks that compose this part of the competition.
 
-%\subsection{Fine-Tuning for UW-image recognition}
-%All three CNN models used in this work were pre-trained on ImageNet and fine-tuned to the available training data by minimizing the cross entropy loss.
-%We used the Adam \cite{kingma_adam:_2015} optimizer with a learning rate of $1E^{-3}$ and default $\beta_1$ and $\beta_2$ values ($\beta_1 = 0.9$, $\beta_2 = 0.999$).
-%The learning rate was decayed by $0.1$ after every $7$ epochs.
-%Early stopping was used with a patience of $5$ by monitoring Area Under the ROC Curve (AUC) on a separate validation set.
-%Input images were resized to $299\times487$ pixels to keep the original aspect ratio.
-%Finally, we used standard dataset augmentation operations such as random translations, scaling and horizontal flips.
-
-
-
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{images/fig1_new.pdf}
+\caption{Our multi-task architecture, generating simultaneously predictions for all four sub-tasks in sub-challenge 2.}
+\label{fig_architecture}
+\end{figure*}

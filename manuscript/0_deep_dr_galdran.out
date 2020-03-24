@@ -1,3 +1,8 @@
 \BOOKMARK [1][-]{section.1}{ Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{ Methodology}{}% 2
-\BOOKMARK [1][-]{section.3}{ References}{}% 3
+\BOOKMARK [2][-]{subsection.2.1}{ DR grading from standard Eye Fundus Images}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{ Fine-Tuning for UW-image recognition}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{ Image Quality Assessment from Retinal Fundus Images}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{ Experimental Evaluation}{}% 6
+\BOOKMARK [1][-]{section.4}{ Discussion}{}% 7
+\BOOKMARK [1][-]{section.5}{ References}{}% 8
