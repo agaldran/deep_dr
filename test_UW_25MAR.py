@@ -169,7 +169,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_od_k, preds_od_k, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_od_k, preds_od_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_od_k, preds_od_k, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_od_auc, preds_od_auc, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_od_auc, preds_od_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_od_auc, preds_od_auc, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_od_both_k, preds_od_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_od_both_k, preds_od_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_od_both_k, preds_od_both_k, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -214,7 +214,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_od_both_auc, preds_od_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_od_both_auc, preds_od_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_od_both_auc, preds_od_both_auc, labels = test_cls(model, test_loader)
 
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_mac_k, preds_mac_k, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_mac_k, preds_mac_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_mac_k, preds_mac_k, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_mac_auc, preds_mac_auc, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_mac_auc, preds_mac_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_mac_auc, preds_mac_auc, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_mac_both_k, preds_mac_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_mac_both_k, preds_mac_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_mac_both_k, preds_mac_both_k, labels = test_cls(model, test_loader)
     ####################################################################################################################
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
 
     if tta:
-        probs_mac_both_auc, preds_mac_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=3)
+        probs_mac_both_auc, preds_mac_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
     else:
         probs_mac_both_auc, preds_mac_both_auc, labels = test_cls(model, test_loader)
     ####################################################################################################################
