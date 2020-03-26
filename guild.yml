@@ -74,7 +74,7 @@
             - save_model=False
 
 ########################################################################################################################
-    dr_grade:
+    ssh -p 2223 -i ~/.ssh/id_rsa_bu_computer  agaldran@talland.bournemouth.ac.uk:
       description:
         This is the main experiment on dr grading
       steps:
@@ -93,7 +93,7 @@
             - oversample=1/4/2/2/7
             - decay_f=0.1
             - metric=kappa
-            - save_model=True
+            - save_model=False
             - n_epochs=50
             - patience=5
 ########################################################################################################################
