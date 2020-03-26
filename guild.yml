@@ -103,22 +103,22 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_od.csv] #
             - model_name=resnet50
             - pretrained=True
-            - base_loss=[gls,ce,focal_loss]
             - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=[0.0001]
-            - lambd=10
-            - exp=[1,2]
+            - base_loss=[gls,ce,focal_loss]
+            - lr=0.0001
+            - lambd=[10]
+            - exp=[1]
             - batch_size=8
             - optimizer=sgd
             - oversample=1/4/2/2/7 # 1/2/2/4/9 for UW
             - decay_f=0.1
-            - metric=[auc,kappa]
+            - metric=kappa
             - save_model=False
             - n_epochs=50
             - patience=5
+            - csv_train=[train_od_1.csv,train_od_2.csv,train_od_3.csv,train_od_4.csv] #
 ########################################################################################################################
     dr_grade_MAC:
       description:
@@ -126,175 +126,38 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_mac.csv] #
             - model_name=resnet50
             - pretrained=True
-            - base_loss=[gls,ce,focal_loss]
             - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=[0.0001]
-            - lambd=10
-            - exp=[1,2]
+            - base_loss=[gls,ce,focal_loss]
+            - lr=0.0001
+            - lambd=[10]
+            - exp=[1]
             - batch_size=8
             - optimizer=sgd
             - oversample=1/4/2/2/7 # 1/2/2/4/9 for UW
             - decay_f=0.1
-            - metric=[auc,kappa]
+            - metric=kappa
             - save_model=False
             - n_epochs=50
             - patience=5
+            - csv_train=[train_mac_1.csv,train_mac_2.csv,train_mac_3.csv,train_mac_4.csv] #
 ########################################################################################################################
-    dr_grade_ALL:
+########################################################################################################################
+########################################################################################################################
+    dr_grade_ALL_UW:
       description:
         This is the main experiment on dr grading
       steps:
         - run: train
           flags:
-            - csv_train=[train_all.csv] #
-            - model_name=resnet50
-            - pretrained=True
-            - base_loss=[gls,ce,focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs]
-            - lr=[0.0001]
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=1/4/2/2/7 # 1/2/2/4/9 for UW
-            - decay_f=0.1
-            - metric=[auc,kappa]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_MAC_UW_AUC:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_mac_UW.csv]
-            - model_name=[resnet50]
-            - pretrained=True
-            - base_loss=[gls,ce,focal_loss]
-            - load_checkpoint=[experiments/best_auc_mac_20Mar,models/resnet50_eyepacs]
-            - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
-            - decay_f=0.1
-            - metric=[auc]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_MAC_UW_KAPPA:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_mac_UW.csv]
-            - model_name=[resnet50]
-            - pretrained=True
-            - base_loss=[gls,ce,focal_loss]
-            - load_checkpoint=[experiments/best_kappa_mac_20Mar,models/resnet50_eyepacs]
-            - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
-            - decay_f=0.1
-            - metric=[kappa]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_OD_UW_AUC:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_od_UW.csv]
             - model_name=[resnet50]
             - pretrained=True
             - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[experiments/best_kappa_od_20Mar,models/resnet50_eyepacs]
+            - load_checkpoint=[models/resnet50_eyepacs] # experiments/best_kappa_both_20Mar,
             - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
-            - decay_f=0.1
-            - metric=[auc]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_OD_UW_KAPPA:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_od_UW.csv]
-            - model_name=[resnet50]
-            - pretrained=True
-            - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[experiments/best_auc_od_20Mar,models/resnet50_eyepacs]
-            - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=[1/2/2/4/9] # for UW
-            - decay_f=0.1
-            - metric=[kappa]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_ALL_UW_AUC:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_all_UW.csv]
-            - model_name=[resnet50]
-            - pretrained=True
-            - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[experiments/best_auc_both_20Mar,models/resnet50_eyepacs]
-            - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
-            - batch_size=8
-            - optimizer=sgd
-            - oversample=[1/1/1/3/8] # for UW_all
-            - decay_f=0.1
-            - metric=[auc]
-            - save_model=False
-            - n_epochs=50
-            - patience=5
-########################################################################################################################
-    dr_grade_ALL_UW_KAPPA:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train
-          flags:
-            - csv_train=[train_all_UW.csv]
-            - model_name=[resnet50]
-            - pretrained=True
-            - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[experiments/best_kappa_both_20Mar,models/resnet50_eyepacs]
-            - lr=0.0001
-            - lambd=10
-            - exp=[1,2]
+            - lambd=[10]
+            - exp=[1]
             - batch_size=8
             - optimizer=sgd
             - oversample=[1/1/1/3/8] # for UW_all
@@ -303,8 +166,54 @@
             - save_model=False
             - n_epochs=50
             - patience=5
+            - csv_train=[train_all_1_UW.csv,train_all_2_UW.csv,train_all_3_UW.csv,train_all_4_UW.csv]
+########################################################################################################################
+    dr_grade_MAC_UW:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - model_name=[resnet50]
+            - pretrained=True
+            - base_loss=[ce,gls,focal_loss]
+            - load_checkpoint=[models/resnet50_eyepacs] # experiments/best_kappa_both_20Mar,
+            - lr=0.0001
+            - lambd=[10]
+            - exp=[1]
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=[1/2/2/4/9] # for UW
+            - decay_f=0.1
+            - metric=[kappa]
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+            - csv_train=[train_mac_1_UW.csv,train_mac_2_UW.csv,train_mac_3_UW.csv,train_mac_4_UW.csv]
+########################################################################################################################
+    dr_grade_OD_UW:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - model_name=[resnet50]
+            - pretrained=True
+            - base_loss=[ce,gls,focal_loss]
+            - load_checkpoint=[models/resnet50_eyepacs] # experiments/best_kappa_both_20Mar,
+            - lr=0.0001
+            - lambd=[10]
+            - exp=[1]
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=[1/2/2/4/9] # for UW
+            - decay_f=0.1
+            - metric=[kappa]
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+            - csv_train=[train_od_1_UW.csv,train_od_2_UW.csv,train_mod_3_UW.csv,train_od_4_UW.csv]
 
-########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -314,7 +223,6 @@
       steps:
         - run: train_multi_task
           flags:
-            - csv_train=train_all_qualities.csv
             - n_classes=18
             - model_name=[resnet50]
             - pretrained=True
@@ -331,21 +239,21 @@
             - save_model=False
             - n_epochs=200
             - patience=10
-
+            - csv_train=[train_all_qualities_1.csv,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv]
+########################################################################################################################
     dr_grade_from_eyepacs_quality:
       description:
         This is the main experiment on dr grading
       steps:
         - run: train
           flags:
-            - csv_train=train_quality.csv
             - n_classes=2
             - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
             - base_loss=[ce,focal_loss]
             - load_checkpoint=[no] #,models/resnet50_eyepacs
             - lr=[0.001,0.0001]
-            - lambd=0 #[0,0.1,1,10]
+            - lambd=0
             - exp=1
             - batch_size=8
             - optimizer=sgd
@@ -355,7 +263,7 @@
             - save_model=False
             - n_epochs=50
             - patience=5
-
+            - csv_train=[train_q_1.csv,train_q_2.csv,train_q_3.csv,train_q_4.csv]
 ########################################################################################################################
     dr_grade_from_eyepacs_artifact:
       description:
@@ -363,14 +271,13 @@
       steps:
         - run: train
           flags:
-            - csv_train=train_artifact.csv
             - n_classes=6
             - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
             - base_loss=[ce,focal_loss]
             - load_checkpoint=[no] #,models/resnet50_eyepacs
             - lr=[0.001,0.0001]
-            - lambd=0 #[0,0.1,1,10]
+            - lambd=0
             - exp=1
             - batch_size=8
             - optimizer=sgd
@@ -380,7 +287,7 @@
             - save_model=False
             - n_epochs=50
             - patience=5
-
+            - csv_train=[train_artifact_1.csv,train_artifact_2.csv,train_artifact_3.csv,train_artifact_4.csv]
 ########################################################################################################################
     dr_grade_from_eyepacs_clarity:
       description:
@@ -388,7 +295,6 @@
       steps:
         - run: train
           flags:
-            - csv_train=[train_clarity.csv]
             - n_classes=5
             - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
@@ -405,16 +311,14 @@
             - save_model=False
             - n_epochs=50
             - patience=5
-
+            - csv_train=[train_clarity_1.csv,train_clarity_2.csv,train_clarity_3.csv,train_clarity_4.csv]
 ########################################################################################################################
     dr_grade_from_eyepacs_field_def:
       description:
         This is the main experiment on dr grading
-        # python train.py --csv_train field_def.csv --n_classes 5 --load_checkpoint models/resnet50_eyepacs
       steps:
         - run: train
           flags:
-            - csv_train=[train_field_def.csv]
             - n_classes=5
             - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
@@ -431,6 +335,6 @@
             - save_model=False
             - n_epochs=50
             - patience=5
-
+            - csv_train=[train_field_def_1.csv,train_field_def_2.csv,train_field_def_3.csv,train_field_def_4.csv]
 
 
