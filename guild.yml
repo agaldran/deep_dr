@@ -92,7 +92,7 @@
             - optimizer=sgd
             - oversample=1/4/2/2/7
             - decay_f=0.1
-            - metric=kappa
+            - metric=kappa_auc_avg
             - save_model=False
             - n_epochs=50
             - patience=5
@@ -109,7 +109,7 @@
             - base_loss=[gls,ce,focal_loss]
             - lr=0.0001
             - lambd=[10]
-            - exp=[2]
+            - exp=[1]
             - batch_size=8
             - optimizer=sgd
             - oversample=1/4/2/2/7 # 1/2/2/4/9 for UW
