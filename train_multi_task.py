@@ -5,7 +5,7 @@ import operator
 from utils.lookahead import Lookahead
 
 from models.get_model import get_arch
-from utils.get_loaders import get_train_val_loaders, modify_dataset
+from utils.get_loaders import get_train_val_loaders, modify_MT_dataset
 from utils.losses import get_cost_sensitive_criterion, get_cost_sensitive_regularized_criterion
 from utils.evaluation import eval_predictions_multi, ewma
 from utils.reproducibility import set_seeds
@@ -73,7 +73,8 @@ parser.add_argument('--n_classes', type=int, default=18, help='number of target 
 parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--optimizer', type=str, default='sgd', help='sgd/adam')
-parser.add_argument('--oversample', type=str, default='1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1', help='oversampling per-class proportions')
+parser.add_argument('--oversample', type=str, default='8/3/1/1/1', help='oversampling per-class proportions')
+parser.add_argument('--oversample_task', type=str, default='clarity', help='oversampling per-class proportions')
 parser.add_argument('--n_epochs', type=int, default=50, help='total max epochs (1000)')
 parser.add_argument('--patience', type=int, default=5, help='epochs until early stopping (20)')
 parser.add_argument('--decay_f', type=float, default=0.1, help='decay factor after 3/4 of patience epochs (0=no decay)')
@@ -160,7 +161,7 @@ def run_one_epoch_multi(loader, model, criterion, optimizer=None):
            np.stack(preds_all_field_def), np.stack(probs_all_field_def), np.stack(labels_all_field_def), run_loss
 
 def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, val_loader,
-          oversample, n_epochs, metric, patience, decay_f, exp_path):
+          oversample, oversample_task, n_epochs, metric, patience, decay_f, exp_path):
     counter_since_checkpoint = 0
     tr_losses, tr_aucs, tr_ks, vl_losses, vl_aucs, vl_ks = [], [], [], [], [], []
     stats = {}
@@ -176,7 +177,7 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
             tr_loss = run_one_epoch_multi(train_loader, model, train_criterion, optimizer)
         else:
             csv_train_path = train_loader.dataset.csv_path
-            train_loader_MOD = modify_dataset(train_loader, csv_train_path=csv_train_path, keep_samples=oversample)
+            train_loader_MOD = modify_MT_dataset(train_loader, csv_train_path=csv_train_path, keep_samples=oversample, task=oversample_task)
             # train one epoch
             tr_preds_q, tr_probs_q, tr_labels_q, \
             tr_preds_a, tr_probs_a, tr_labels_a, \
@@ -280,6 +281,7 @@ if __name__ == '__main__':
     csv_val = csv_train.replace('train', 'val')
     oversample = args.oversample.split('/')
     oversample = list(map(float, oversample))
+    oversample_task = args.oversample_task
 
     n_epochs, patience, decay_f, metric = args.n_epochs, args.patience, args.decay_f, args.metric
     save_model = str2bool(args.save_model)
@@ -342,7 +344,7 @@ if __name__ == '__main__':
 
     print('* Starting to train\n','-' * 10)
     m1 = train_multi(model, optimizer, train_crit, val_crit, train_loader, val_loader,
-              oversample, n_epochs, metric, patience, decay_f, experiment_path)
+              oversample, oversample_task, n_epochs, metric, patience, decay_f, experiment_path)
     print("auc: %f" % m1)
 
 
