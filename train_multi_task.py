@@ -286,7 +286,7 @@ if __name__ == '__main__':
     n_epochs, patience, decay_f, metric = args.n_epochs, args.patience, args.decay_f, args.metric
     save_model = str2bool(args.save_model)
     n_classes = args.n_classes
-    if len(oversample) != n_classes: sys.exit('oversample must be a tuple of len {:d}'.format(n_classes))
+    # if len(oversample) != n_classes: sys.exit('oversample must be a tuple of len {:d}'.format(n_classes))
 
     if save_model:
         save_path = args.save_path
