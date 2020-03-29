@@ -216,6 +216,7 @@
 
 ########################################################################################################################
 ########################################################################################################################
+# python train_multi_task --model_name resnext50_sws --base_loss ce --lambd 0 --oversample 10/4/1/1/1 --oversample_task field_def --save_model False
     dr_grade_quality_multi_task_OS:
       description:
         This is the main experiment on dr grading
