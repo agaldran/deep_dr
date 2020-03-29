@@ -224,9 +224,9 @@
         - run: train_multi_task
           flags:
             - n_classes=18
-            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
+            - model_name=[resnet50_sws,resnext50_sws] #resnet50,,resnext50
             - pretrained=True
-            - base_loss=[ce,focal_loss]
+            - base_loss=[ce] #,focal_loss
             - load_checkpoint=[no]
             - lr=[0.0001]
             - lambd=0 
@@ -239,7 +239,7 @@
             - save_model=False
             - n_epochs=200
             - patience=10
-            - csv_train=[train_all_qualities_1.csv,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv]
+            - csv_train=[train_all_qualities_1.csv,train_all_qualities_2.csv] #,train_all_qualities_3.csv,train_all_qualities_4.csv
 ########################################################################################################################
     dr_grade_quality:
       description:
