@@ -178,9 +178,8 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
         else:
             csv_train_path = train_loader.dataset.csv_path
             train_loader_MOD = modify_MT_dataset(train_loader, csv_train_path=csv_train_path, keep_samples=oversample, task=oversample_task)
-            print(len(train_loader_MOD.dataset), len(train_loader_MOD.quality), len(train_loader_MOD.artifact))
-            sys.exit()
-
+            print(len(train_loader_MOD.dataset), len(train_loader_MOD.quality), len(train_loader_MOD.artifact),
+                  len(train_loader_MOD.clarity), len(train_loader_MOD.field_def))
             # train one epoch
             tr_preds_q, tr_probs_q, tr_labels_q, \
             tr_preds_a, tr_probs_a, tr_labels_a, \
