@@ -178,8 +178,6 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
         else:
             csv_train_path = train_loader.dataset.csv_path
             train_loader_MOD = modify_MT_dataset(train_loader, csv_train_path=csv_train_path, keep_samples=oversample, task=oversample_task)
-            print(len(train_loader_MOD.dataset), len(train_loader_MOD.dataset.quality), len(train_loader_MOD.dataset.artifact),
-                  len(train_loader_MOD.dataset.clarity), len(train_loader_MOD.dataset.field_def))
             # train one epoch
             tr_preds_q, tr_probs_q, tr_labels_q, \
             tr_preds_a, tr_probs_a, tr_labels_a, \
@@ -251,11 +249,11 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
             print('\n Early stopping the training, trained for {:d} epochs'.format(epoch))
             del model
             torch.cuda.empty_cache()
-            return best_auc
+            return best_auc, vl_auc_q, vl_auc_a, vl_auc_c, vl_acc_f
 
     del model
     torch.cuda.empty_cache()
-    return best_auc
+    return best_auc, vl_auc_q, vl_auc_a, vl_auc_c, vl_acc_f
 
 if __name__ == '__main__':
     '''
@@ -345,13 +343,20 @@ if __name__ == '__main__':
                                                                         lambd=lambd, exp=exp)
 
     print('* Starting to train\n','-' * 10)
-    m1 = train_multi(model, optimizer, train_crit, val_crit, train_loader, val_loader,
+    m1, m2, m3, m4, m5 = train_multi(model, optimizer, train_crit, val_crit, train_loader, val_loader,
               oversample, oversample_task, n_epochs, metric, patience, decay_f, experiment_path)
     print("auc: %f" % m1)
-
+    print("auc_q: %f" % m2)
+    print("vl_auc_a: %f" % m3)
+    print("vl_auc_c: %f" % m4)
+    print("vl_acc_f: %f" % m5)
 
 
     if save_model:
         file = open(osp.join(experiment_path, 'val_metrics.txt'), 'w')
         file.write(str(m1))
+        file.write(str(m2))
+        file.write(str(m3))
+        file.write(str(m4))
+        file.write(str(m5))
         file.close()
