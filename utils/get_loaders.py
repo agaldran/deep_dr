@@ -281,7 +281,7 @@ def modify_MT_dataset(train_loader, csv_train_path, keep_samples=2000, task='cla
     train_dr_under_oversampled = pd.concat(dfs)
     train_loader_new.dataset.im_list = train_dr_under_oversampled['image_id'].values
     for t in tasks:
-        setattr(train_loader_new, t, train_dr_under_oversampled[t].values)
+        setattr(train_loader_new.dataset, t, train_dr_under_oversampled[t].values)
 
     return train_loader_new
 
