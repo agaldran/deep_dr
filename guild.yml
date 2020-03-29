@@ -251,7 +251,7 @@
         - run: train_multi_task
           flags:
             - n_classes=18
-            - model_name=[resnet50_sws] #resnet50,resnext50, resnet50_sws,resnext50_sws
+            - model_name=[resnext50_sws] #resnet50,resnext50, resnet50_sws,resnext50_sws
             - pretrained=True
             - base_loss=[ce] #,focal_loss
             - load_checkpoint=[no]
