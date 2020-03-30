@@ -248,7 +248,7 @@ if __name__ == '__main__':
         if load_checkpoint != 'no':
             print('* Loading weights from previous checkpoint={}'.format(load_checkpoint))
             model, stats, optimizer_state_dict = load_model(model, load_checkpoint, device='cpu', with_opt=True)
-        if n_classes != 5:
+        if n_classes != 5 or n_classes!=18: # we have pretrained models for these two cases
             num_ftrs = model.fc.in_features
             model.fc = torch.nn.Linear(num_ftrs, n_classes)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))

@@ -279,7 +279,7 @@
             - model_name=[resnext50_sws]
             - pretrained=True
             - base_loss=[ce,focal_loss]
-            - load_checkpoint=[no,experiments/best_quality_MT_f1] #,models/resnet50_eyepacs
+            - load_checkpoint=[experiments/best_quality_MT_f1] #no,models/resnet50_eyepacs
             - lr=[0.0001]
             - lambd=0
             - exp=1
