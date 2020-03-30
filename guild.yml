@@ -156,7 +156,7 @@
             - base_loss=[ce,gls]#,focal_loss
             - load_checkpoint=[models/resnet50_eyepacs,experiments/best_both_f3] # experiments/best_kappa_both_20Mar,
             - lr=0.0001
-            - lambd=[10]
+            - lambd=[1]
             - exp=[1]
             - batch_size=8
             - optimizer=sgd
