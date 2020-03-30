@@ -153,8 +153,8 @@
           flags:
             - model_name=[resnet50]
             - pretrained=True
-            - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs] # experiments/best_kappa_both_20Mar,
+            - base_loss=[ce,gls]#,focal_loss
+            - load_checkpoint=[models/resnet50_eyepacs,experiments/best_both_f3] # experiments/best_kappa_both_20Mar,
             - lr=0.0001
             - lambd=[10]
             - exp=[1]
@@ -258,17 +258,14 @@
             - lambd=0 
             - exp=1
             - batch_size=8
-            - optimizer=adam  # ------------------------------------
+            - optimizer=sgd
             - oversample=1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
             - decay_f=0.1
             - metric=auc
             - save_model=False
-            - n_epochs=50
-            - patience=5
-#            - n_epochs=200
-#            - patience=10
+            - n_epochs=200
+            - patience=10
             - csv_train=[train_all_qualities_1.csv,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv]
-            # train_all_qualities_1.csv,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv
 
 #########################################################################################################################
     dr_grade_quality:
