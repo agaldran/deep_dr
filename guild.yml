@@ -24,6 +24,21 @@
         - file: models
         - file: results
 
+    train_quality:
+      # The default 'main' attribute is 'train' based on the
+      # operation name. While we could omit this below, it's good
+      # practice to specify it.
+      main: train_quality
+      # In this configuration, we require the project 'data'
+      # directory. Guild creates a symbolic link named 'data' to
+      # this directory in each run directory for the operation.
+      requires:
+        - file: data
+        - file: experiments
+        - file: utils
+        - file: models
+        - file: results
+
     train_multi_task:
       # The default 'main' attribute is 'train' based on the
       # operation name. While we could omit this below, it's good
@@ -273,7 +288,7 @@
       description:
         This is the main experiment on dr grading
       steps:
-        - run: train
+        - run: train_quality
           flags:
             - n_classes=2
             - model_name=[resnext50_sws]
