@@ -249,7 +249,7 @@ def train_multi(model, optimizer, train_criterion, val_criterion, train_loader, 
             print('\n Early stopping the training, trained for {:d} epochs'.format(epoch))
             del model
             torch.cuda.empty_cache()
-            return best_auc, vl_auc_q, vl_auc_a, vl_auc_c, vl_acc_f
+            return best_auc, vl_auc_q, vl_auc_a, vl_auc_c, vl_auc_f
 
     del model
     torch.cuda.empty_cache()
@@ -349,7 +349,7 @@ if __name__ == '__main__':
     print("auc_q: %f" % m2)
     print("vl_auc_a: %f" % m3)
     print("vl_auc_c: %f" % m4)
-    print("vl_acc_f: %f" % m5)
+    print("vl_auc_f: %f" % m5)
 
 
     if save_model:
