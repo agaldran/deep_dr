@@ -162,7 +162,7 @@
             - optimizer=sgd
             - oversample=[1/1/1/3/8] # for UW_all
             - decay_f=0.1
-            - metric=[kappa]
+            - metric=[kappa_auc_avg]
             - save_model=False
             - n_epochs=50
             - patience=5
@@ -185,7 +185,7 @@
             - optimizer=sgd
             - oversample=[1/2/2/4/9] # for UW
             - decay_f=0.1
-            - metric=[kappa]
+            - metric=[kappa_auc_avg]
             - save_model=False
             - n_epochs=50
             - patience=5
@@ -208,7 +208,7 @@
             - optimizer=sgd
             - oversample=[1/2/2/4/9] # for UW
             - decay_f=0.1
-            - metric=[kappa]
+            - metric=[kappa_auc_avg]
             - save_model=False
             - n_epochs=50
             - patience=5
