@@ -123,7 +123,7 @@ def train_cls(model, optimizer, train_criterion, val_criterion, train_loader, va
     tr_losses, tr_aucs, tr_ks, vl_losses, vl_aucs, vl_ks = [], [], [], [], [], []
     stats = {}
     is_better, best_monitoring_metric = compare_op(metric)
-    best_kappa, best_auc = 0,0
+    best_kappa, best_auc, best_acc = 0,0,0
     for epoch in range(n_epochs):
         print('\n EPOCH: {:d}/{:d}'.format(epoch+1, n_epochs))
         if np.max(np.unique(oversample)) == 1:
