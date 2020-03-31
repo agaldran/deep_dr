@@ -211,7 +211,7 @@
             - metric=[kappa_auc_avg]
             - save_model=False
             - n_epochs=50
-            - patience=5
+            - patience=10
             - csv_train=[train_od_1_UW.csv,train_od_2_UW.csv,train_od_3_UW.csv,train_od_4_UW.csv]
 
 ########################################################################################################################
