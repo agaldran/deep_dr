@@ -200,7 +200,7 @@
             - model_name=[resnet50]
             - pretrained=True
             - base_loss=[ce,gls,focal_loss]
-            - load_checkpoint=[models/resnet50_eyepacs] # experiments/best_kappa_both_20Mar,
+            - load_checkpoint=[experiments/best_both_f3] # ,models/resnet50_eyepacs
             - lr=0.0001
             - lambd=[10]
             - exp=[1]
