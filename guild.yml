@@ -212,7 +212,7 @@
             - save_model=False
             - n_epochs=50
             - patience=5
-            - csv_train=[train_od_1_UW.csv,train_od_2_UW.csv,train_mod_3_UW.csv,train_od_4_UW.csv]
+            - csv_train=[train_od_1_UW.csv,train_od_2_UW.csv,train_3_UW.csv,train_od_4_UW.csv]
 
 ########################################################################################################################
 ########################################################################################################################
