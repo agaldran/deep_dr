@@ -216,32 +216,32 @@
 
 ########################################################################################################################
 ########################################################################################################################
-    dr_grade_quality_multi_task_OS:
-      description:
-        This is the main experiment on dr grading
-      steps:
-        - run: train_multi_task
-          flags:
-            - n_classes=18
-            - model_name=[resnext50_sws] #resnet50_sws,resnet50,,resnext50
-            - pretrained=True
-            - base_loss=[ce] #,focal_loss
-            - load_checkpoint=[no]
-            - lr=[0.0001]
-            - lambd=0
-            - exp=1
-            - batch_size=8
-            - optimizer=sgd  # ------------------------------------
-#            - oversample=10/4/1/1/1
-#            - oversample_task=field_def
-            - oversample=8/3/1/1/1
-            - oversample_task=clarity
-            - decay_f=0.1
-            - metric=auc
-            - save_model=False
-            - n_epochs=200
-            - patience=10
-            - csv_train=[train_all_qualities_1.csv] #,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv
+#    dr_grade_quality_multi_task_OS:
+#      description:
+#        This is the main experiment on dr grading
+#      steps:
+#        - run: train_multi_task
+#          flags:
+#            - n_classes=18
+#            - model_name=[resnext50_sws] #resnet50_sws,resnet50,,resnext50
+#            - pretrained=True
+#            - base_loss=[ce] #,focal_loss
+#            - load_checkpoint=[no]
+#            - lr=[0.0001]
+#            - lambd=0
+#            - exp=1
+#            - batch_size=8
+#            - optimizer=sgd  # ------------------------------------
+##            - oversample=10/4/1/1/1
+##            - oversample_task=field_def
+#            - oversample=8/3/1/1/1
+#            - oversample_task=clarity
+#            - decay_f=0.1
+#            - metric=auc
+#            - save_model=False
+#            - n_epochs=200
+#            - patience=10
+#            - csv_train=[train_all_qualities_1.csv] #,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv
 ########################################################################################################################
     dr_grade_quality_multi_task:
       description:
@@ -250,10 +250,12 @@
         - run: train_multi_task
           flags:
             - n_classes=18
-            - model_name=[resnet50,resnext50, resnet50_sws,resnext50_sws] #resnet50,resnext50, resnet50_sws,resnext50_sws
+#            - model_name=[resnet50,resnext50, resnet50_sws,resnext50_sws] #resnet50,resnext50, resnet50_sws,resnext50_sws
+#            - load_checkpoint=[no]
+            - model_name=[resnet50] #resnet50,resnext50, resnet50_sws,resnext50_sws
+            - load_checkpoint=[models/resnet50_eyepacs]
             - pretrained=True
             - base_loss=[ce]
-            - load_checkpoint=[no]
             - lr=[0.0001]
             - lambd=0 
             - exp=1
@@ -266,7 +268,6 @@
             - n_epochs=200
             - patience=10
             - csv_train=[train_all_qualities_1.csv,train_all_qualities_2.csv,train_all_qualities_3.csv,train_all_qualities_4.csv]
-
 #########################################################################################################################
     dr_grade_quality:
       description:
