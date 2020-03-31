@@ -18,3 +18,4 @@ patient_id,image_id,DR_level,dr
 19,data/images_uw/19_r1.jpg,1,1
 23,data/images_uw/23_r1.jpg,1,1
 24,data/images_uw/24_r1.jpg,3,3
+31,data/images_uw/31_r1.jpg,5,4
