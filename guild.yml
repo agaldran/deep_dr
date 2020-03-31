@@ -280,7 +280,7 @@
             - pretrained=True
             - base_loss=[ce] #,focal_loss
             - load_checkpoint=[no] #,models/resnet50_eyepacs, models/resnet50_eyepacs,
-            - lr=[3e-4] #0.0001
+            - lr=[0.0001] #
             - lambd=0
             - exp=1
             - batch_size=8
