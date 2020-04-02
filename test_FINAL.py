@@ -26,8 +26,8 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('boolean value expected.')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_test_od', type=str, default='data/test_od.csv', help='path to test OD data csv')
-parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', help='path to test MAC data csv')
+parser.add_argument('--csv_test_od', type=str, default='data/test_od_ONSITE.csv', help='path to test OD data csv')
+parser.add_argument('--csv_test_mac', type=str, default='data/test_mac_ONSITE.csv', help='path to test MAC data csv')
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
