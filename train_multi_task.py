@@ -346,7 +346,7 @@ if __name__ == '__main__':
     m1, m2, m3, m4, m5 = train_multi(model, optimizer, train_crit, val_crit, train_loader, val_loader,
               oversample, oversample_task, n_epochs, metric, patience, decay_f, experiment_path)
     print("auc: %f" % m1)
-    print("auc_q: %f" % m2)
+    print("val_auc_q: %f" % m2)
     print("vl_auc_a: %f" % m3)
     print("vl_auc_c: %f" % m4)
     print("vl_auc_f: %f" % m5)
