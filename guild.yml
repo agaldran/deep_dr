@@ -437,7 +437,7 @@
             - patience=5
             - csv_train=[train_artifact_1.csv,train_artifact_2.csv,train_artifact_3.csv,train_artifact_4.csv]
 ########################################################################################################################
-    dr_grade_clarity:
+    dr_grade_clarity_ce:
       description:
         This is the main experiment on dr grading
       steps:
@@ -446,9 +446,9 @@
             - n_classes=5
             - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
             - pretrained=True
-            - base_loss=[ce,focal_loss]
+            - base_loss=[ce]
             - load_checkpoint=[no] #,models/resnet50_eyepacs
-            - lr=[0.001,0.0001]
+            - lr=[0.0001]
             - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
@@ -461,7 +461,31 @@
             - patience=5
             - csv_train=[train_clarity_1.csv,train_clarity_2.csv,train_clarity_3.csv,train_clarity_4.csv]
 ########################################################################################################################
-    dr_grade_field_def:
+    dr_grade_clarity_fl:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - n_classes=5
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
+            - pretrained=True
+            - base_loss=[focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.0001]
+            - lambd=0 #[0,0.1,1,10]
+            - exp=1
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=8/3/1/1/1 # for clarity
+            - decay_f=0.1
+            - metric=auc
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+            - csv_train=[train_clarity_1.csv,train_clarity_2.csv,train_clarity_3.csv,train_clarity_4.csv]
+########################################################################################################################
+    dr_grade_field_def_ce:
       description:
         This is the main experiment on dr grading
       steps:
@@ -472,7 +496,7 @@
             - pretrained=True
             - base_loss=[ce,focal_loss]
             - load_checkpoint=[no] #,models/resnet50_eyepacs
-            - lr=[0.001,0.0001]
+            - lr=[0.0001]
             - lambd=0 #[0,0.1,1,10]
             - exp=1
             - batch_size=8
@@ -484,5 +508,28 @@
             - n_epochs=50
             - patience=5
             - csv_train=[train_field_def_1.csv,train_field_def_2.csv,train_field_def_3.csv,train_field_def_4.csv]
-
+########################################################################################################################
+    dr_grade_field_def_fl:
+      description:
+        This is the main experiment on dr grading
+      steps:
+        - run: train
+          flags:
+            - n_classes=5
+            - model_name=[resnet50,resnet50_sws,resnext50,resnext50_sws]
+            - pretrained=True
+            - base_loss=[focal_loss]
+            - load_checkpoint=[no] #,models/resnet50_eyepacs
+            - lr=[0.0001]
+            - lambd=0 #[0,0.1,1,10]
+            - exp=1
+            - batch_size=8
+            - optimizer=sgd
+            - oversample=10/4/1/1/1 # for field_def
+            - decay_f=0.1
+            - metric=auc
+            - save_model=False
+            - n_epochs=50
+            - patience=5
+            - csv_train=[train_field_def_1.csv,train_field_def_2.csv,train_field_def_3.csv,train_field_def_4.csv]
 
