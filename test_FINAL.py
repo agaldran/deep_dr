@@ -29,12 +29,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--csv_test_od', type=str, default='data/test_od.csv', help='path to test OD data csv')
 parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', help='path to test MAC data csv')
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
-# parser.add_argument('--load_path_od_k', type=str, default='experiments/best_kappa_od_20Mar', help='path to saved model - od1')
-# parser.add_argument('--load_path_od_auc', type=str, default='experiments/best_auc_od_20Mar', help='path to saved model - od2')
-# parser.add_argument('--load_path_mac_k', type=str, default='experiments/best_kappa_mac_20Mar', help='path to saved model - mac1')
-# parser.add_argument('--load_path_mac_auc', type=str, default='experiments/best_auc_mac_20Mar', help='path to saved model - mac2')
-# parser.add_argument('--load_path_both_k', type=str, default='experiments/best_kappa_both_20Mar', help='path to saved model - od+mac1')
-# parser.add_argument('--load_path_both_auc', type=str, default='experiments/best_auc_both_20Mar', help='path to saved model - od+mac2')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
@@ -337,7 +331,7 @@ if __name__ == '__main__':
     # AVERAGE ACROSS FOLDS
     mean_probs_mac_both = 0.2454 * probs_mac_f1_both + 0.2491 * probs_mac_f2_both + 0.2530 * probs_mac_f3_both + 0.2524 * probs_mac_f4_both
 
-    # AVERAGE ACROSS OD/BOTH
+    # AVERAGE ACROSS MAC/BOTH
     probs_mac_final = 0.5078 * mean_probs_mac_both + 0.4921 * mean_probs_mac
     preds_mac_final = np.argmax(probs_mac_final, axis=1)
     df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_mac_final), columns=['image_id', 'preds'])

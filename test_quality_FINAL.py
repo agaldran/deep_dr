@@ -12,7 +12,14 @@ import torch
 import os.path as osp
 import os
 import sys
+import json
 
+
+def get_model_name(config_file_path):
+    config_file = osp.join(config_file_path, 'config.cfg')
+    with open(config_file, 'r') as f:
+        cfg_dict = json.load(f)
+    return cfg_dict['model_name']
 
 def str2bool(v):
     # as seen here: https://stackoverflow.com/a/43357954/3208255
@@ -225,39 +232,88 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     csv_test_q_MT = args.csv_test_q_MT
-    model_name_MT = args.model_name_MT
-    load_path_MT = args.load_path_MT
-
-    model_name_quality = args.model_name_quality
-    model_name_artifact = args.model_name_artifact
-    model_name_field_def = args.model_name_field_def
-    model_name_clarity = args.model_name_clarity
-    load_path_quality = args.load_path_quality
-    load_path_artifact = args.load_path_artifact
-    load_path_field_def = args.load_path_field_def
-    load_path_clarity = args.load_path_clarity
-
+    csv_test_q = args.csv_test_q
     pretrained = args.pretrained
     bs = args.batch_size
-    csv_test_q = args.csv_test_q
     n_classes = args.n_classes
     tta = args.tta
     csv_out = args.csv_out
 
+    load_path_MT_f1 = 'experiments/best_quality_MT_f1'
+    load_path_MT_f2= 'experiments/best_quality_MT_f2'
+    load_path_MT_f3 = 'experiments/best_quality_MT_f3'
+    load_path_MT_f4 = 'experiments/best_quality_MT_f4'
+
+    print(get_model_name(load_path_MT_f1))
+    sys.exit()
+
+
+    model_name_MT = args.model_name_MT
+    load_path_MT = args.load_path_MT
+
+
+
+    # model_name_quality = args.model_name_quality
+    # model_name_artifact = args.model_name_artifact
+    # model_name_field_def = args.model_name_field_def
+    # model_name_clarity = args.model_name_clarity
+    # load_path_quality = args.load_path_quality
+    # load_path_artifact = args.load_path_artifact
+    # load_path_field_def = args.load_path_field_def
+    # load_path_clarity = args.load_path_clarity
+
+
+
     ####################################################################################################################
     # build results for MT model
     n_classes = 18
-    print('* Instantiating MT model {}, pretrained={}'.format(model_name_MT, pretrained))
-    model, mean, std = get_arch(model_name_MT, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_MT, device='cpu')
+    # F1
+    print('* Instantiating MT model {}, pretrained={}, fold 1'.format(get_model_name(load_path_MT_f1), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_MT_f1), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_MT_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q_MT,  batch_size=bs, mean=mean, std=std, qualities=True)
-
-    probs_tta_q, preds_tta_q, probs_tta_a, preds_tta_a, probs_tta_c, preds_tta_c, probs_tta_f, preds_tta_f \
+    probs_q_f1, preds_q_f1, probs_a_f1, preds_a_f1, probs_c_f1, preds_c_f1, probs_f_f1, preds_f_f1\
         = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+    # F2
+    print('* Instantiating MT model {}, pretrained={}, fold 2'.format(get_model_name(load_path_MT_f2), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_MT_f2), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_MT_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q_MT,  batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_q_f2, preds_q_f2, probs_a_f2, preds_a_f2, probs_c_f2, preds_c_f2, probs_f_f2, preds_f_f2\
+        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+    # F3
+    print('* Instantiating MT model {}, pretrained={}, fold 3'.format(get_model_name(load_path_MT_f3), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_MT_f3), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_MT_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q_MT, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_q_f3, preds_q_f3, probs_a_f3, preds_a_f3, probs_c_f3, preds_c_f3, probs_f_f3, preds_f_f3 \
+        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+    # F4
+    print('* Instantiating MT model {}, pretrained={}, fold 4'.format(get_model_name(load_path_MT_f4), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_MT_f4), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_MT_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q_MT, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_q_f4, preds_q_f4, probs_a_f4, preds_a_f4, probs_c_f4, preds_c_f4, probs_f_f4, preds_f_f4 \
+        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_MT_q = 0.2540 * probs_q_f1 + 0.2482 * probs_q_f2 + 0.2503 * probs_q_f3 + 0.2474 * probs_q_f4
+    mean_probs_MT_a = 0.2540 * probs_a_f1 + 0.2482 * probs_a_f2 + 0.2503 * probs_a_f3 + 0.2474 * probs_a_f4
+    mean_probs_MT_c = 0.2540 * probs_c_f1 + 0.2482 * probs_c_f2 + 0.2503 * probs_c_f3 + 0.2474 * probs_c_f4
+    mean_probs_MT_f = 0.2540 * probs_f_f1 + 0.2482 * probs_f_f2 + 0.2503 * probs_f_f3 + 0.2474 * probs_f_f4
+
+
 
 
     ####################################################################################################################
