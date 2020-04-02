@@ -244,10 +244,6 @@ if __name__ == '__main__':
     load_path_MT_f3 = 'experiments/best_quality_MT_f3'
     load_path_MT_f4 = 'experiments/best_quality_MT_f4'
 
-    print(get_model_name(load_path_MT_f1))
-    sys.exit()
-
-
     model_name_MT = args.model_name_MT
     load_path_MT = args.load_path_MT
 
@@ -313,6 +309,7 @@ if __name__ == '__main__':
     mean_probs_MT_c = 0.2540 * probs_c_f1 + 0.2482 * probs_c_f2 + 0.2503 * probs_c_f3 + 0.2474 * probs_c_f4
     mean_probs_MT_f = 0.2540 * probs_f_f1 + 0.2482 * probs_f_f2 + 0.2503 * probs_f_f3 + 0.2474 * probs_f_f4
 
+    sys.exit()
 
 
 
