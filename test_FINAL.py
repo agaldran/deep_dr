@@ -132,6 +132,8 @@ if __name__ == '__main__':
     seed_value = 0
     set_seeds(seed_value, use_cuda)
 
+    TTA_N=1
+
     # gather parser parameters
     args = parser.parse_args()
     model_name = args.model_name
@@ -163,82 +165,82 @@ if __name__ == '__main__':
     # build results for od-centered with OD models
     ####################################################################################################################
     # FOLD 1
-    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on OD_fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_od_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f1, preds_od_f1, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f1, preds_od_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 2
-    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on OD_fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_od_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f2, preds_od_f2, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f2, preds_od_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 3
-    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on OD_fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_od_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f3, preds_od_f3, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f3, preds_od_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 4
-    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on OD_fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_od_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f4, preds_od_f4, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f4, preds_od_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_od = 0.2570 * probs_od_f1 + 0.2532 * probs_od_f2 + 0.2385 * probs_od_f3 + 0.2512 * probs_od_f4
 
     ####################################################################################################################
     # build results for od-centered with BOTH models
     # FOLD 1
-    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f1_both, preds_od_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f1_both, preds_od_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 2
-    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f2_both, preds_od_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f2_both, preds_od_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 3
-    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f3_both, preds_od_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f3_both, preds_od_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 4
-    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-    probs_od_f4_both, preds_od_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_od_f4_both, preds_od_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_od_both = 0.2454 * probs_od_f1_both + 0.2491 * probs_od_f2_both + 0.2530 * probs_od_f3_both + 0.2524 * probs_od_f4_both
 
@@ -252,82 +254,82 @@ if __name__ == '__main__':
     # build results for macula-centered with MAC models
     ####################################################################################################################
     # FOLD 1
-    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on MAC_fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_mac_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f1, preds_mac_f1, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f1, preds_mac_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 2
-    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on MAC_fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_mac_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f2, preds_mac_f2, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f2, preds_mac_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 3
-    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on MAC_fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_mac_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f3, preds_mac_f3, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f3, preds_mac_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 4
-    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on MAC_fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_mac_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f4, preds_mac_f4, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f4, preds_mac_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_mac = 0.2521 * probs_mac_f1 + 0.2488 * probs_mac_f2 + 0.2425 * probs_mac_f3 + 0.2565 * probs_mac_f4
 
     ####################################################################################################################
     # build results for mac-centered with BOTH models
     # FOLD 1
-    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f1_both, preds_mac_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f1_both, preds_mac_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 2
-    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f2_both, preds_mac_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f2_both, preds_mac_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 3
-    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f3_both, preds_mac_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f3_both, preds_mac_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # FOLD 4
-    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    print('* Instantiating model {}, pretrained={}, trained on BOTH_fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_both_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
-    probs_mac_f4_both, preds_mac_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    probs_mac_f4_both, preds_mac_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_mac_both = 0.2454 * probs_mac_f1_both + 0.2491 * probs_mac_f2_both + 0.2530 * probs_mac_f3_both + 0.2524 * probs_mac_f4_both
 
