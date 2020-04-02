@@ -203,6 +203,7 @@ if __name__ == '__main__':
     data_path = 'data'
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
+    print(device)
     # reproducibility
     seed_value = 0
     set_seeds(seed_value, use_cuda)
