@@ -4,10 +4,10 @@ import torch.nn.functional as F
 import numpy as np
 import scipy.stats as stats2
 import sys
-try:
-    from kornia.losses import FocalLoss as focal_loss
-except:
-    pass
+# try:
+#     from kornia.losses import FocalLoss as focal_loss
+# except:
+from .kornia_focal_loss import FocalLoss as focal_loss
 
 
 def get_gauss_label(label, n_classes, amplifier, noise=0):
