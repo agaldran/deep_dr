@@ -29,12 +29,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--csv_test_od', type=str, default='data/test_od.csv', help='path to test OD data csv')
 parser.add_argument('--csv_test_mac', type=str, default='data/test_mac.csv', help='path to test MAC data csv')
 parser.add_argument('--model_name', type=str, default='resnet50', help='selected architecture')
-parser.add_argument('--load_path_od_k', type=str, default='experiments/best_kappa_od_20Mar', help='path to saved model - od1')
-parser.add_argument('--load_path_od_auc', type=str, default='experiments/best_auc_od_20Mar', help='path to saved model - od2')
-parser.add_argument('--load_path_mac_k', type=str, default='experiments/best_kappa_mac_20Mar', help='path to saved model - mac1')
-parser.add_argument('--load_path_mac_auc', type=str, default='experiments/best_auc_mac_20Mar', help='path to saved model - mac2')
-parser.add_argument('--load_path_both_k', type=str, default='experiments/best_kappa_both_20Mar', help='path to saved model - od+mac1')
-parser.add_argument('--load_path_both_auc', type=str, default='experiments/best_auc_both_20Mar', help='path to saved model - od+mac2')
+# parser.add_argument('--load_path_od_k', type=str, default='experiments/best_kappa_od_20Mar', help='path to saved model - od1')
+# parser.add_argument('--load_path_od_auc', type=str, default='experiments/best_auc_od_20Mar', help='path to saved model - od2')
+# parser.add_argument('--load_path_mac_k', type=str, default='experiments/best_kappa_mac_20Mar', help='path to saved model - mac1')
+# parser.add_argument('--load_path_mac_auc', type=str, default='experiments/best_auc_mac_20Mar', help='path to saved model - mac2')
+# parser.add_argument('--load_path_both_k', type=str, default='experiments/best_kappa_both_20Mar', help='path to saved model - od+mac1')
+# parser.add_argument('--load_path_both_auc', type=str, default='experiments/best_auc_both_20Mar', help='path to saved model - od+mac2')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
@@ -141,15 +141,21 @@ if __name__ == '__main__':
     # gather parser parameters
     args = parser.parse_args()
     model_name = args.model_name
+    exp_path = 'experiments/'
+    load_path_od_f1 = osp.join(exp_path, 'best_od_f1')
+    load_path_od_f2 = osp.join(exp_path, 'best_od_f2')
+    load_path_od_f3 = osp.join(exp_path, 'best_od_f3')
+    load_path_od_f4 = osp.join(exp_path, 'best_od_f4')
 
-    load_path_od_k = args.load_path_od_k
-    load_path_od_auc = args.load_path_od_auc
+    load_path_mac_f1 = osp.join(exp_path, 'best_mac_f1')
+    load_path_mac_f2 = osp.join(exp_path, 'best_mac_f2')
+    load_path_mac_f3 = osp.join(exp_path, 'best_mac_f3')
+    load_path_mac_f4 = osp.join(exp_path, 'best_mac_f4')
 
-    load_path_mac_k = args.load_path_mac_k
-    load_path_mac_auc = args.load_path_mac_auc
-
-    load_path_both_k = args.load_path_both_k
-    load_path_both_auc = args.load_path_both_auc
+    load_path_both_f1 = osp.join(exp_path, 'best_both_f1')
+    load_path_both_f2 = osp.join(exp_path, 'best_both_f2')
+    load_path_both_f3 = osp.join(exp_path, 'best_both_f3')
+    load_path_both_f4 = osp.join(exp_path, 'best_both_f4')
 
     pretrained = args.pretrained
     bs = args.batch_size
@@ -160,139 +166,181 @@ if __name__ == '__main__':
     csv_out = args.csv_out
 
     ####################################################################################################################
-    # build results for od-centered with OD_k model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    # build results for od-centered with OD models
+    ####################################################################################################################
+    # FOLD 1
+    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_od_k, device='cpu')
+    model, stats = load_model(model, load_path_od_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_od_k, preds_od_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_od_k, preds_od_k, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for od-centered with OD_auc model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    probs_od_f1, preds_od_f1, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 2
+    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_od_auc, device='cpu')
+    model, stats = load_model(model, load_path_od_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_od_auc, preds_od_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_od_auc, preds_od_auc, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for od-centered with both_k model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    probs_od_f2, preds_od_f2, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 3
+    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_both_k, device='cpu')
+    model, stats = load_model(model, load_path_od_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_od_both_k, preds_od_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_od_both_k, preds_od_both_k, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for od-centered with both_auc model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    probs_od_f3, preds_od_f3, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 4
+    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_both_auc, device='cpu')
+    model, stats = load_model(model, load_path_od_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_od_both_auc, preds_od_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_od_both_auc, preds_od_both_auc, labels = test_cls(model, test_loader)
+    probs_od_f4, preds_od_f4, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_od = 0.2570 * probs_od_f1 + 0.2532 * probs_od_f2 + 0.2385 * probs_od_f3 + 0.2512 * probs_od_f4
 
     ####################################################################################################################
-    mean_probs_od = 0.30*probs_od_k + 0.30*probs_od_auc + 0.20*probs_od_both_k + 0.20*probs_od_both_auc
-    preds_od = np.argmax(mean_probs_od, axis=1)
-    df_od = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_od), columns=['image_id', 'preds'])
-    ####################################################################################################################
-
-    ####################################################################################################################
-    ####################################################################################################################
-
-    # build results for macula-centered with MAC_k model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    # build results for od-centered with BOTH models
+    # FOLD 1
+    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_mac_k, device='cpu')
+    model, stats = load_model(model, load_path_both_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_mac_k, preds_mac_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_mac_k, preds_mac_k, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for macula-centered with MAC_auc model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
+    probs_od_f1_both, preds_od_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 2
+    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_mac_auc, device='cpu')
+    model, stats = load_model(model, load_path_both_f2, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_mac_auc, preds_mac_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_mac_auc, preds_mac_auc, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for macula-centered with both_k model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
+    probs_od_f2_both, preds_od_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 3
+    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_both_k, device='cpu')
+    model, stats = load_model(model, load_path_both_f3, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_mac_both_k, preds_mac_both_k, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_mac_both_k, preds_mac_both_k, labels = test_cls(model, test_loader)
-    ####################################################################################################################
-    # build results for macula-centered with both_auc model
-    print('* Instantiating model {}, pretrained={}'.format(model_name, pretrained))
+    test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
+    probs_od_f3_both, preds_od_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 4
+    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
     model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_both_auc, device='cpu')
+    model, stats = load_model(model, load_path_both_f4, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_mac,  batch_size=bs, mean=mean, std=std)
+    test_loader = get_test_loader(csv_path_test=csv_test_od,  batch_size=bs, mean=mean, std=std)
+    probs_od_f4_both, preds_od_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_od_both = 0.2454 * probs_od_f1_both + 0.2491 * probs_od_f2_both + 0.2530 * probs_od_f3_both + 0.2524 * probs_od_f4_both
 
-    if tta:
-        probs_mac_both_auc, preds_mac_both_auc, labels = test_cls_tta_dihedral(model, test_loader, n=4)
-    else:
-        probs_mac_both_auc, preds_mac_both_auc, labels = test_cls(model, test_loader)
+    # AVERAGE ACROSS OD/BOTH
+    probs_od_final = 0.5085*mean_probs_od_both +  0.4915*mean_probs_od
+    preds_od_final = np.argmax(probs_od_final, axis=1)
+    df_od = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_od_final), columns=['image_id', 'preds'])
+
+
     ####################################################################################################################
-    mean_probs_mac = 0.30 * probs_mac_k + 0.30 * probs_mac_auc + 0.20 * probs_mac_both_k + 0.20 * probs_mac_both_auc
-    preds_mac = np.argmax(mean_probs_mac, axis=1)
-    df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_mac), columns=['image_id', 'preds'])
+    # build results for macula-centered with MAC models
+    ####################################################################################################################
+    # FOLD 1
+    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_mac_f1, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f1, preds_mac_f1, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 2
+    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_mac_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f2, preds_mac_f2, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 3
+    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_mac_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f3, preds_mac_f3, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 4
+    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_mac_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f4, preds_mac_f4, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_mac = 0.2521 * probs_mac_f1 + 0.2488 * probs_mac_f2 + 0.2425 * probs_mac_f3 + 0.2565 * probs_mac_f4
 
+    ####################################################################################################################
+    # build results for mac-centered with BOTH models
+    # FOLD 1
+    print('* Instantiating model {}, pretrained={}, trained on fold 1'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_both_f1, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f1_both, preds_mac_f1_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 2
+    print('* Instantiating model {}, pretrained={}, trained on fold 2'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_both_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f2_both, preds_mac_f2_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 3
+    print('* Instantiating model {}, pretrained={}, trained on fold 3'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_both_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f3_both, preds_mac_f3_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # FOLD 4
+    print('* Instantiating model {}, pretrained={}, trained on fold 4'.format(model_name, pretrained))
+    model, mean, std = get_arch(model_name, pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_both_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_mac, batch_size=bs, mean=mean, std=std)
+    probs_mac_f4_both, preds_mac_f4_both, labels = test_cls_tta_dihedral(model, test_loader, n=4)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_mac_both = 0.2454 * probs_mac_f1_both + 0.2491 * probs_mac_f2_both + 0.2530 * probs_mac_f3_both + 0.2524 * probs_mac_f4_both
+
+    # AVERAGE ACROSS OD/BOTH
+    probs_mac_final = 0.5078 * mean_probs_mac_both + 0.4921 * mean_probs_mac
+    preds_mac_final = np.argmax(probs_mac_final, axis=1)
+    df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_mac_final), columns=['image_id', 'preds'])
 
     ####################################################################################################################
 
