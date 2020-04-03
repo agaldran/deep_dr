@@ -515,7 +515,6 @@ if __name__ == '__main__':
     submission['image_id'] = submission['image_id'].apply(lambda x: x.split('/')[-1][:-4])
     submission = submission[['Overall quality', 'Artifact', 'Clarity', 'Field definition', 'image_id']]
 
-
     submission_good = pd.merge(df_good, submission, on="image_id")
     submission_good = submission_good.drop(['Overall quality_x', 'Artifact_x', 'Clarity_x', 'Field definition_x'], axis=1)
     submission_good.columns = ['image_id', 'Overall quality', 'Artifact', 'Clarity', 'Field definition']
