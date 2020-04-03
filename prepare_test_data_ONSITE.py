@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
     im_list = [osp.join(path_raw_data, n1, n2+'.jpg') for n1, n2 in zip(image_path_list, image_list)]
     num_ims = len(im_list)
-    Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
-                       for i in tqdm(range(num_ims)))
+    # Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
+    #                    for i in tqdm(range(num_ims)))
 
     fake_grades = len(df['image_id'])*[0]
     # fake_grades[1], fake_grades[2] = 1, 1
@@ -142,3 +142,17 @@ if __name__ == "__main__":
     df_mac.drop(['center', 'DR_Level'], axis=1).to_csv(osp.join(path_data_out, 'test_mac_ONSITE.csv'), index=False)
     print('Test data prepared')
 
+    csv_path = osp.join(path_raw_data, 'Challenge2_upload.csv')
+    df_q = pd.read_csv(csv_path)
+    df_q['image_id'] = df_q['image_id'].apply(lambda x: 'data/test_images_ONSITE/' + x + '.jpg')
+    fake_grades = len(df_q['image_id']) * [0]
+    df_q['dr'] = fake_grades
+    df_q = df_q.drop(['Overall quality','Artifact','Clarity','Field definition'], axis=1)
+    df_q.to_csv('test_q_ONSITE.csv', index=False)
+    df_q['quality'] = df_q['dr']
+    df_q['artifact'] = df_q['dr']
+    df_q['clarity'] = df_q['dr']
+    df_q['field_def'] = df_q['dr']
+    df_q = df_q.drop(['dr'], axis=1)
+    df_q.to_csv('test_q_mt_ONSITE.csv', index=False)
+    print('Test data for quality assessment prepared')

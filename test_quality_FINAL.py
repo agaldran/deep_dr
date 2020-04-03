@@ -33,21 +33,8 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('boolean value expected.')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv_test_q', type=str, default='data/test_q.csv', help='path to test OD data csv')
-
-parser.add_argument('--model_name_quality', type=str, default='resnet50_sws', help='selected architecture')
-parser.add_argument('--model_name_artifact', type=str, default='resnet50', help='selected architecture')
-parser.add_argument('--model_name_field_def', type=str, default='resnext50', help='selected architecture')
-parser.add_argument('--model_name_clarity', type=str, default='resnext50', help='selected architecture')
-parser.add_argument('--load_path_quality', type=str, default='experiments/best_quality_16Mar', help='path to saved model - quality')
-parser.add_argument('--load_path_artifact', type=str, default='experiments/best_artifact_16Mar', help='path to saved model - artifact')
-parser.add_argument('--load_path_field_def', type=str, default='experiments/best_field_def_16Mar', help='path to saved model - field def')
-parser.add_argument('--load_path_clarity', type=str, default='experiments/best_clarity_16Mar', help='path to saved model - clarity')
-
-parser.add_argument('--csv_test_q_MT', type=str, default='data/test_q_mt.csv', help='path to test OD data csv')
-parser.add_argument('--model_name_MT', type=str, default='resnext50_sws', help='selected architecture')
-parser.add_argument('--load_path_MT', type=str, default='experiments/best_auc_MT_qualities_20Mar', help='path to saved model - MT')
-
+parser.add_argument('--csv_test_q', type=str, default='data/test_q_ONSITE.csv', help='path to test OD data csv')
+parser.add_argument('--csv_test_q_MT', type=str, default='data/test_q_mt_ONSITE.csv', help='path to test OD data csv')
 parser.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=True, help='from pretrained weights')
 parser.add_argument('--tta', type=str2bool, nargs='?', const=True, default=True, help='use tta')
 parser.add_argument('--n_classes', type=int, default=5, help='number of target classes (5)')
@@ -232,7 +219,6 @@ if __name__ == '__main__':
 
     # gather parser parameters
     args = parser.parse_args()
-
     csv_test_q_MT = args.csv_test_q_MT
     csv_test_q = args.csv_test_q
     pretrained = args.pretrained
@@ -317,12 +303,8 @@ if __name__ == '__main__':
     mean_probs_MT_f = 0.2540 * probs_fMT_f1 + 0.2482 * probs_fMT_f2 + 0.2503 * probs_fMT_f3 + 0.2474 * probs_fMT_f4
 
     ####################################################################################################################
-
-    load_path_q_f1 = 'experiments/best_q_f1'
-    load_path_q_f2 = 'experiments/best_q_f2'
-    load_path_q_f3 = 'experiments/best_q_f3'
-    load_path_q_f4 = 'experiments/best_q_f4'
-    # F1
+    # build results for QUALITY model
+    n_classes = 2
     print('* Instantiating MT model {}, pretrained={}, fold 1/Q'.format(get_model_name(load_path_q_f1), pretrained))
     model, mean, std = get_arch(get_model_name(load_path_q_f1), pretrained=pretrained, n_classes=n_classes)
     model, stats = load_model(model, load_path_q_f1, device='cpu')
@@ -365,25 +347,50 @@ if __name__ == '__main__':
     preds_q = np.argmax(mean_probs_q, axis=1)
     df_quality = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_q), columns=['image_id', 'Overall quality'])
     df_quality.to_csv('quality_results_debug.csv', index=False)
-    sys.exit()
 
     ####################################################################################################################
     # build results for ARTIFACT model
     n_classes = 6
-    print('* Instantiating ARTIFACT model {}, pretrained={}'.format(model_name_artifact, pretrained))
-    model, mean, std = get_arch(model_name_artifact, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_artifact, device='cpu')
+    # F1
+    print('* Instantiating MT model {}, pretrained={}, fold 1/A'.format(get_model_name(load_path_a_f1), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_a_f1), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_a_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_a, preds_a, labels = test_cls_tta_dihedral(model, test_loader, n=3)
-    else:
-        probs_a, preds_a, labels = test_cls(model, test_loader)
-    mean_probs_a = 0.5 * probs_tta_a + 0.5 * probs_a
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_a_f1, preds_a_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F2
+    print('* Instantiating MT model {}, pretrained={}, fold 2/A'.format(get_model_name(load_path_a_f2), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_a_f2), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_a_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_a_f2, preds_a_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F3
+    print('* Instantiating MT model {}, pretrained={}, fold 3/A'.format(get_model_name(load_path_a_f3), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_a_f3), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_a_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_a_f3, preds_a_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F4
+    print('* Instantiating MT model {}, pretrained={}, fold 4/A'.format(get_model_name(load_path_a_f4), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_a_f4), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_a_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_a_f4, preds_a_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_a = 0.2527 * probs_a_f1 + 0.2490 * probs_a_f2 + 0.2511 * probs_a_f3 + 0.2472 * probs_a_f4
+    # AVERAGE ACROSS MT/A
+    mean_probs_a = 0.5008 * mean_probs_a + 0.4992 * mean_probs_MT_a
     preds_a = np.argmax(mean_probs_a, axis=1)
     df_artifact = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_a), columns=['image_id', 'Artifact'])
     def map_label_art(label):
@@ -394,23 +401,51 @@ if __name__ == '__main__':
         elif label == 4: return 8
         else: return 10
     df_artifact['Artifact'] = df_artifact['Artifact'].apply(map_label_art)
+    df_artifact.to_csv('artifact_results_debug.csv', index=False)
+
     ####################################################################################################################
     # build results for CLARITY model
     n_classes = 5
-    print('* Instantiating CLARITY model {}, pretrained={}'.format(model_name_clarity, pretrained))
-    model, mean, std = get_arch(model_name_clarity, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_clarity, device='cpu')
+    # F1
+    print('* Instantiating MT model {}, pretrained={}, fold 1/C'.format(get_model_name(load_path_c_f1), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_c_f1), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_c_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_c, preds_c, labels = test_cls_tta_dihedral(model, test_loader, n=3)
-    else:
-        probs_c, preds_c, labels = test_cls(model, test_loader)
-    mean_probs_c = 0.5 * probs_tta_c + 0.5 * probs_c
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_c_f1, preds_c_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F2
+    print('* Instantiating MT model {}, pretrained={}, fold 2/C'.format(get_model_name(load_path_c_f2), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_c_f2), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_c_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_c_f2, preds_c_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F3
+    print('* Instantiating MT model {}, pretrained={}, fold 3/C'.format(get_model_name(load_path_c_f3), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_c_f3), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_c_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_c_f3, preds_c_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F4
+    print('* Instantiating MT model {}, pretrained={}, fold 4/C'.format(get_model_name(load_path_c_f4), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_c_f4), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_c_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_c_f4, preds_c_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_c = 0.0000 * probs_c_f1 + 0.0000 * probs_c_f2 + 0.0000 * probs_c_f3 + 0.0000 * probs_c_f4
+    # AVERAGE ACROSS MT/A
+    mean_probs_c = 0.0000 * mean_probs_c + 0.0000 * mean_probs_MT_c
     preds_c = np.argmax(mean_probs_c, axis=1)
     df_clarity = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_c), columns=['image_id', 'Clarity'])
     def map_label_clarity(lab):
@@ -420,23 +455,50 @@ if __name__ == '__main__':
         elif lab == 3: return 8
         else: return 10
     df_clarity['Clarity'] = df_clarity['Clarity'].apply(map_label_clarity)
+    df_clarity.to_csv('clarity_results_debug.csv', index=False)
     ####################################################################################################################
     # build results for FIELD DEFINITION model
     n_classes = 5
-    print('* Instantiating FIELD DEFINITION model {}, pretrained={}'.format(model_name_field_def, pretrained))
-    model, mean, std = get_arch(model_name_field_def, pretrained=pretrained, n_classes=n_classes)
-
-    model, stats = load_model(model, load_path_field_def, device='cpu')
+    # F1
+    print('* Instantiating MT model {}, pretrained={}, fold 1/F'.format(get_model_name(load_path_f_f1), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_f_f1), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_f_f1, device='cpu')
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
-
-    if tta:
-        probs_f, preds_f, labels = test_cls_tta_dihedral(model, test_loader, n=3)
-    else:
-        probs_f, preds_f, labels = test_cls(model, test_loader)
-    mean_probs_f = 0.5 * probs_tta_f + 0.5 * probs_f
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_f_f1, preds_f_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F2
+    print('* Instantiating MT model {}, pretrained={}, fold 2/F'.format(get_model_name(load_path_f_f2), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_f_f2), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_f_f2, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_f_f2, preds_f_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F3
+    print('* Instantiating MT model {}, pretrained={}, fold 3/F'.format(get_model_name(load_path_f_f3), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_f_f3), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_f_f3, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_f_f3, preds_f_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # F4
+    print('* Instantiating MT model {}, pretrained={}, fold 4/F'.format(get_model_name(load_path_f_f4), pretrained))
+    model, mean, std = get_arch(get_model_name(load_path_f_f4), pretrained=pretrained, n_classes=n_classes)
+    model, stats = load_model(model, load_path_f_f4, device='cpu')
+    model = model.to(device)
+    print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
+    print('* Creating Dataloaders, batch size = {:d}'.format(bs))
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    probs_f_f4, preds_f_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
+    # AVERAGE ACROSS FOLDS
+    mean_probs_f = 0.2532 * probs_f_f1 + 0.2618 * probs_f_f2 + 0.2411 * probs_f_f3 + 0.2438 * probs_f_f4
+    # AVERAGE ACROSS MT/A
+    mean_probs_f = 0.5008 * mean_probs_f + 0.4992 * mean_probs_MT_f
     preds_f = np.argmax(mean_probs_f, axis=1)
     df_field_def = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_f), columns=['image_id', 'Field definition'])
     def map_label_fd(label):
@@ -446,10 +508,7 @@ if __name__ == '__main__':
         elif label == 3: return 8
         else: return 10
     df_field_def['Field definition'] = df_field_def['Field definition'].apply(map_label_fd)
-
-    # df_artifact.to_csv('artifact_results_debug.csv', index=False)
-    # df_clarity.to_csv('clarity_results_debug.csv', index=False)
-    # df_field_def.to_csv('field_def_results_debug.csv', index=False)
+    df_field_def.to_csv('field_def_results_debug.csv', index=False)
 
     from functools import reduce
     submission = reduce(lambda x, y: pd.merge(x, y, on='image_id'), [df_quality, df_artifact, df_clarity, df_field_def])
