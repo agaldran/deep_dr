@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
     im_list = [osp.join(path_raw_data, n1, n2 + '.jpg') for n1, n2 in zip(image_path_list, image_list)]
     num_ims = len(im_list)
-    Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
-                       for i in tqdm(range(num_ims)))
+    # Parallel(n_jobs=6)(delayed(process_im_fast)(i, im_list, path_out_ims, path_out_fovs)
+    #                    for i in tqdm(range(num_ims)))
     fake_grades = len(df['image_id'])*[0]
     df['dr'] = fake_grades
     df['center'] = ['od' if 'l1' in n or 'r1' in n else 'mac' for n in list(df.image_id)]
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     df_od['image_id'] = df_od['image_id'].apply(lambda x: 'data/test_images_UW_ONSITE/' + x + '.jpg')
     df_mac['image_id'] = df_mac['image_id'].apply(lambda x: 'data/test_images_UW_ONSITE/' + x + '.jpg')
 
-    df_od.drop(['center', 'DR_level'], axis=1).to_csv(osp.join(path_data_out, 'test_od_UW_ONSITE.csv'), index=False)
-    df_mac.drop(['center', 'DR_level'], axis=1).to_csv(osp.join(path_data_out, 'test_mac_UW_ONSITE.csv'), index=False)
+    df_od.drop(['center', 'DR_level'], axis=1).to_csv(osp.join(path_data_out, 'test_od_UW_ONSITEE.csv'), index=False)
+    df_mac.drop(['center', 'DR_level'], axis=1).to_csv(osp.join(path_data_out, 'test_mac_UW_ONSITEE.csv'), index=False)
     print('Test data prepared')
 
