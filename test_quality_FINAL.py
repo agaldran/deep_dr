@@ -312,7 +312,6 @@ if __name__ == '__main__':
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
-    print(test_loader.dataset.)
     probs_q_f1, preds_q_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2/Q'.format(get_model_name(load_path_q_f2), pretrained))
