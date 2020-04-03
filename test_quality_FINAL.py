@@ -443,9 +443,9 @@ if __name__ == '__main__':
     test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_c_f4, preds_c_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
-    mean_probs_c = 0.0000 * probs_c_f1 + 0.0000 * probs_c_f2 + 0.0000 * probs_c_f3 + 0.0000 * probs_c_f4
+    mean_probs_c = 0.24938 * probs_c_f1 + 0.25405 * probs_c_f2 + 0.2479 * probs_c_f3 + 0.24866 * probs_c_f4
     # AVERAGE ACROSS MT/A
-    mean_probs_c = 0.0000 * mean_probs_c + 0.0000 * mean_probs_MT_c
+    mean_probs_c = 0.4975 * mean_probs_c + 0.5024 * mean_probs_MT_c
     preds_c = np.argmax(mean_probs_c, axis=1)
     df_clarity = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_c), columns=['image_id', 'Clarity'])
     def map_label_clarity(lab):
