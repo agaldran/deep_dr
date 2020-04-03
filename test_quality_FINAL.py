@@ -208,7 +208,7 @@ if __name__ == '__main__':
     python test.py --tta True --csv_out results/submission_galdran_QUALITY_ONSITE.csv
     '''
     data_path = 'data'
-    df_good = pd.read_csv('results/Challenge2_upload.csv')
+    df_good = pd.read_csv('results/Challenge2_upload_ONSITE.csv')
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     # reproducibility

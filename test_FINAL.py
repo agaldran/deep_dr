@@ -125,7 +125,7 @@ if __name__ == '__main__':
     python test.py --tta True --csv_out results/submission_galdran_DR_ONSITE.csv
     '''
     data_path = 'data'
-    path_subm_csv = 'results/Challenge1_upload.csv'
+    path_subm_csv = 'results/Challenge1_upload_ONSITE.csv'
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     # reproducibility
