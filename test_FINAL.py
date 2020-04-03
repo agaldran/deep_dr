@@ -339,7 +339,6 @@ if __name__ == '__main__':
     df_mac = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_mac_final), columns=['image_id', 'preds'])
 
     ####################################################################################################################
-    print(df_od['image_id'].values)
     df_od['image_id'] = df_od['image_id'].apply(lambda x: x.split('/')[-1][:-4])
     df_mac['image_id'] = df_mac['image_id'].apply(lambda x: x.split('/')[-1][:-4])
     df_all = pd.concat([df_od, df_mac], axis=0)
