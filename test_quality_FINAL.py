@@ -215,7 +215,7 @@ if __name__ == '__main__':
     seed_value = 0
     set_seeds(seed_value, use_cuda)
 
-    TTA_N = 1
+    TTA_N = 3
 
     # gather parser parameters
     args = parser.parse_args()
@@ -346,7 +346,7 @@ if __name__ == '__main__':
     mean_probs_q = 0.5035 * mean_probs_q + 0.4965 * mean_probs_MT_q
     preds_q = np.argmax(mean_probs_q, axis=1)
     df_quality = pd.DataFrame(zip(list(test_loader.dataset.im_list), preds_q), columns=['image_id', 'Overall quality'])
-    df_quality.to_csv('quality_results_debug.csv', index=False)
+    # df_quality.to_csv('quality_results_debug.csv', index=False)
 
     ####################################################################################################################
     # build results for ARTIFACT model
@@ -401,7 +401,7 @@ if __name__ == '__main__':
         elif label == 4: return 8
         else: return 10
     df_artifact['Artifact'] = df_artifact['Artifact'].apply(map_label_art)
-    df_artifact.to_csv('artifact_results_debug.csv', index=False)
+    # df_artifact.to_csv('artifact_results_debug.csv', index=False)
 
     ####################################################################################################################
     # build results for CLARITY model
@@ -455,7 +455,7 @@ if __name__ == '__main__':
         elif lab == 3: return 8
         else: return 10
     df_clarity['Clarity'] = df_clarity['Clarity'].apply(map_label_clarity)
-    df_clarity.to_csv('clarity_results_debug.csv', index=False)
+    # df_clarity.to_csv('clarity_results_debug.csv', index=False)
     ####################################################################################################################
     # build results for FIELD DEFINITION model
     n_classes = 5
@@ -508,7 +508,7 @@ if __name__ == '__main__':
         elif label == 3: return 8
         else: return 10
     df_field_def['Field definition'] = df_field_def['Field definition'].apply(map_label_fd)
-    df_field_def.to_csv('field_def_results_debug.csv', index=False)
+    # df_field_def.to_csv('field_def_results_debug.csv', index=False)
 
     from functools import reduce
     submission = reduce(lambda x, y: pd.merge(x, y, on='image_id'), [df_quality, df_artifact, df_clarity, df_field_def])
@@ -520,3 +520,4 @@ if __name__ == '__main__':
     submission_good.columns = ['image_id', 'Overall quality', 'Artifact', 'Clarity', 'Field definition']
     submission_good = submission_good[['Overall quality', 'Artifact', 'Clarity', 'Field definition','image_id']]
     submission_good.to_csv(csv_out, index=False)
+    print('Done! Saved results to {}'.format(csv_out))

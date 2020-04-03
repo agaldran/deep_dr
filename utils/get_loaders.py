@@ -137,14 +137,14 @@ def get_train_val_loaders(csv_path_train, csv_path_val, batch_size=8,
                           mean=None, std=None, qualities=False):
     train_dataset, val_dataset = get_train_val_datasets(csv_path_train, csv_path_val, mean=mean, std=std, qualities=qualities)
 
-    # train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size * torch.cuda.device_count(),
-    #                           num_workers=8, pin_memory=True, shuffle=True)
-    # val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size * torch.cuda.device_count(),
-    #                         num_workers=8, pin_memory=True, shuffle=False)
-    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size,
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size * torch.cuda.device_count(),
                               num_workers=8, pin_memory=True, shuffle=True)
-    val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size,
+    val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size * torch.cuda.device_count(),
                             num_workers=8, pin_memory=True, shuffle=False)
+    # train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size,
+    #                           num_workers=8, pin_memory=True, shuffle=True)
+    # val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size,
+    #                         num_workers=8, pin_memory=True, shuffle=False)
     return train_loader, val_loader
 
 def get_test_loader(csv_path_test, batch_size=8, mean=None, std=None, qualities=False):

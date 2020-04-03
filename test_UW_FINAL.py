@@ -133,7 +133,7 @@ if __name__ == '__main__':
     seed_value = 0
     set_seeds(seed_value, use_cuda)
 
-    TTA_N = 1
+    TTA_N = 3
 
     # gather parser parameters
     args = parser.parse_args()
@@ -350,3 +350,4 @@ if __name__ == '__main__':
     submission.drop(['DR_level'], axis=1, inplace=True)
     submission.columns = ['image_id', 'DR_level']
     submission.to_csv(csv_out, index=False)
+    print('Done! Saved results to {}'.format(csv_out))
