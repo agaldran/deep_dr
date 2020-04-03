@@ -216,6 +216,7 @@ if __name__ == '__main__':
     set_seeds(seed_value, use_cuda)
 
     TTA_N = 3
+    TTA_N = 4
 
     # gather parser parameters
     args = parser.parse_args()
