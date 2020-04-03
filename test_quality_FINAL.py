@@ -253,8 +253,8 @@ if __name__ == '__main__':
     load_path_c_f4 = 'experiments/best_c_f4'
 
 
-    ####################################################################################################################
-    # build results for MT model
+    # ####################################################################################################################
+    # # build results for MT model
     n_classes = 18
     # F1
     print('* Instantiating MT model {}, pretrained={}, fold 1/MT'.format(get_model_name(load_path_MT_f1), pretrained))
@@ -311,7 +311,8 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
+    print(test_loader.dataset.)
     probs_q_f1, preds_q_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2/Q'.format(get_model_name(load_path_q_f2), pretrained))
@@ -320,7 +321,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_q_f2, preds_q_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F3
     print('* Instantiating MT model {}, pretrained={}, fold 3/Q'.format(get_model_name(load_path_q_f3), pretrained))
@@ -329,7 +330,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_q_f3, preds_q_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F4
     print('* Instantiating MT model {}, pretrained={}, fold 4/Q'.format(get_model_name(load_path_q_f4), pretrained))
@@ -338,7 +339,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_q_f4, preds_q_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_q = 0.2548 * probs_q_f1 + 0.2408 * probs_q_f2 + 0.2503 * probs_q_f3 + 0.2540 * probs_q_f4
@@ -358,7 +359,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_a_f1, preds_a_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2/A'.format(get_model_name(load_path_a_f2), pretrained))
@@ -367,7 +368,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_a_f2, preds_a_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F3
     print('* Instantiating MT model {}, pretrained={}, fold 3/A'.format(get_model_name(load_path_a_f3), pretrained))
@@ -376,7 +377,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_a_f3, preds_a_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F4
     print('* Instantiating MT model {}, pretrained={}, fold 4/A'.format(get_model_name(load_path_a_f4), pretrained))
@@ -385,7 +386,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_a_f4, preds_a_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_a = 0.2527 * probs_a_f1 + 0.2490 * probs_a_f2 + 0.2511 * probs_a_f3 + 0.2472 * probs_a_f4
@@ -413,7 +414,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_c_f1, preds_c_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2/C'.format(get_model_name(load_path_c_f2), pretrained))
@@ -422,7 +423,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_c_f2, preds_c_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F3
     print('* Instantiating MT model {}, pretrained={}, fold 3/C'.format(get_model_name(load_path_c_f3), pretrained))
@@ -431,7 +432,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_c_f3, preds_c_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F4
     print('* Instantiating MT model {}, pretrained={}, fold 4/C'.format(get_model_name(load_path_c_f4), pretrained))
@@ -440,7 +441,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_c_f4, preds_c_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_c = 0.0000 * probs_c_f1 + 0.0000 * probs_c_f2 + 0.0000 * probs_c_f3 + 0.0000 * probs_c_f4
@@ -466,7 +467,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_f_f1, preds_f_f1, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2/F'.format(get_model_name(load_path_f_f2), pretrained))
@@ -475,7 +476,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_f_f2, preds_f_f2, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F3
     print('* Instantiating MT model {}, pretrained={}, fold 3/F'.format(get_model_name(load_path_f_f3), pretrained))
@@ -484,7 +485,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_f_f3, preds_f_f3, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # F4
     print('* Instantiating MT model {}, pretrained={}, fold 4/F'.format(get_model_name(load_path_f_f4), pretrained))
@@ -493,7 +494,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("Total params: {0:,}".format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
-    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std, qualities=True)
+    test_loader = get_test_loader(csv_path_test=csv_test_q, batch_size=bs, mean=mean, std=std)
     probs_f_f4, preds_f_f4, labels = test_cls_tta_dihedral(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_f = 0.2532 * probs_f_f1 + 0.2618 * probs_f_f2 + 0.2411 * probs_f_f3 + 0.2438 * probs_f_f4
