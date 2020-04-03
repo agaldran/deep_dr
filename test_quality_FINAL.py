@@ -228,6 +228,8 @@ if __name__ == '__main__':
     seed_value = 0
     set_seeds(seed_value, use_cuda)
 
+    TTA_N = 1
+
     # gather parser parameters
     args = parser.parse_args()
 
@@ -272,7 +274,7 @@ if __name__ == '__main__':
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q_MT,  batch_size=bs, mean=mean, std=std, qualities=True)
     probs_q_f1, preds_q_f1, probs_a_f1, preds_a_f1, probs_c_f1, preds_c_f1, probs_f_f1, preds_f_f1\
-        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+        = test_cls_tta_dihedral_MT(model, test_loader, n=TTA_N)
     # F2
     print('* Instantiating MT model {}, pretrained={}, fold 2'.format(get_model_name(load_path_MT_f2), pretrained))
     model, mean, std = get_arch(get_model_name(load_path_MT_f2), pretrained=pretrained, n_classes=n_classes)
@@ -282,7 +284,7 @@ if __name__ == '__main__':
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q_MT,  batch_size=bs, mean=mean, std=std, qualities=True)
     probs_q_f2, preds_q_f2, probs_a_f2, preds_a_f2, probs_c_f2, preds_c_f2, probs_f_f2, preds_f_f2\
-        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+        = test_cls_tta_dihedral_MT(model, test_loader, n=TTA_N)
     # F3
     print('* Instantiating MT model {}, pretrained={}, fold 3'.format(get_model_name(load_path_MT_f3), pretrained))
     model, mean, std = get_arch(get_model_name(load_path_MT_f3), pretrained=pretrained, n_classes=n_classes)
@@ -292,7 +294,7 @@ if __name__ == '__main__':
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q_MT, batch_size=bs, mean=mean, std=std, qualities=True)
     probs_q_f3, preds_q_f3, probs_a_f3, preds_a_f3, probs_c_f3, preds_c_f3, probs_f_f3, preds_f_f3 \
-        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+        = test_cls_tta_dihedral_MT(model, test_loader, n=TTA_N)
     # F4
     print('* Instantiating MT model {}, pretrained={}, fold 4'.format(get_model_name(load_path_MT_f4), pretrained))
     model, mean, std = get_arch(get_model_name(load_path_MT_f4), pretrained=pretrained, n_classes=n_classes)
@@ -302,7 +304,7 @@ if __name__ == '__main__':
     print('* Creating Dataloaders, batch size = {:d}'.format(bs))
     test_loader = get_test_loader(csv_path_test=csv_test_q_MT, batch_size=bs, mean=mean, std=std, qualities=True)
     probs_q_f4, preds_q_f4, probs_a_f4, preds_a_f4, probs_c_f4, preds_c_f4, probs_f_f4, preds_f_f4 \
-        = test_cls_tta_dihedral_MT(model, test_loader, n=3)
+        = test_cls_tta_dihedral_MT(model, test_loader, n=TTA_N)
     # AVERAGE ACROSS FOLDS
     mean_probs_MT_q = 0.2540 * probs_q_f1 + 0.2482 * probs_q_f2 + 0.2503 * probs_q_f3 + 0.2474 * probs_q_f4
     mean_probs_MT_a = 0.2540 * probs_a_f1 + 0.2482 * probs_a_f2 + 0.2503 * probs_a_f3 + 0.2474 * probs_a_f4
